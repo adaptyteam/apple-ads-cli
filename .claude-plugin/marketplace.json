@@ -1,0 +1,29 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "adapty",
+  "description": "Adapty's official Claude Code plugins.",
+  "owner": { "name": "Adapty", "email": "support@adapty.io" },
+  "plugins": [
+    {
+      "name": "apple-ads",
+      "description": "Run Apple Search Ads from your agent — analysis, bids, budgets, keywords, search-term harvesting and cohort ROAS through the Adapty CLI. Includes a planning skill that needs no account.",
+      "source": "./",
+      "category": "marketing",
+      "homepage": "https://adapty.io/docs/developer-cli-ads-manager-skill"
+    },
+    {
+      "name": "apple-ads-benchmarks",
+      "description": "Apple Ads benchmarks for subscription apps — CPI, CPT, conversion and ROAS by niche and country, with a normalization protocol that stops bad comparisons.",
+      "source": { "source": "github", "repo": "adaptyteam/apple-ads-benchmarks" },
+      "category": "marketing",
+      "homepage": "https://adapty.io/apple-ads-for-subscription-apps/"
+    },
+    {
+      "name": "adapty-sdk-integration",
+      "description": "End-to-end Adapty SDK integration for mobile apps — dashboard setup, SDK install, paywall, and store configuration. Supports iOS, Android, Flutter, React Native, Unity, KMP, and Capacitor.",
+      "source": { "source": "github", "repo": "adaptyteam/adapty-sdk-integration-skill" },
+      "category": "development",
+      "homepage": "https://adapty.io/docs"
+    }
+  ]
+}

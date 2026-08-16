@@ -1,0 +1,10 @@
+{
+  "name": "apple-ads",
+  "version": "0.1.0",
+  "description": "Run Apple Search Ads from your agent — analysis, bids, budgets, keywords, search-term harvesting and cohort ROAS through the Adapty CLI. Includes a planning skill that needs no account.",
+  "author": { "name": "Adapty", "email": "support@adapty.io" },
+  "homepage": "https://adapty.io/docs/developer-cli-ads-manager-skill",
+  "repository": "https://github.com/adaptyteam/apple-ads-cli",
+  "license": "MIT",
+  "keywords": ["apple-ads", "apple-search-ads", "asa", "user-acquisition", "aso", "subscriptions"]
+}
