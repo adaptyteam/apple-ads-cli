@@ -73,8 +73,9 @@ Settings → Capabilities → enable code execution → allow network egress →
 | | |
 |---|---|
 | **`apple-ads`** | The operator. Reads performance, changes bids and budgets, adds keywords and negatives, harvests search terms, launches and pauses campaigns — all through the CLI, with confirmation before anything that spends money. |
+| **`apple-ads-audit`** | The read-only auditor. Checks account health, serving, live structure, traffic ownership, duplicate Exact keywords, and a simple same-window Apple-versus-Adapty install comparison. It never writes. |
 | **`apple-ads-strategy`** | The planner. **Needs no account, no CLI, no subscription.** Turns "I have a TV remote app, where do I start" into a full account structure, keyword taxonomy, starting budget and negative list. |
-| **Playbooks** | Weekly review · cohort ROAS · search-term harvesting · bid optimization · budget reallocation · campaign launch · negative keyword hygiene · competitor check · runaway spend · automation rules. |
+| **Playbooks** | Weekly check-in · account health · structure audit · cohort ROAS · keyword bid review · Market Intelligence keyword opportunities · search-term harvesting · negative keyword mining · CPP routing · budget reallocation · campaign launch · runaway spend · automation rules. |
 | **Vertical guides** | Category-specific playbooks — demand profile, keyword taxonomy, account structure, starting economics and the failure modes specific to that category. |
 
 Every playbook is readable right here on GitHub. You do not need to install anything, or have an Adapty account, to use them.
@@ -85,6 +86,8 @@ Every playbook is readable right here on GitHub. You do not need to install anyt
 
 ```
 > Which of my ad groups lost money last month at day-30 cohort ROAS?
+> Audit this live account and show me what needs attention — do not change anything.
+> Which US search terms appear for these three competitor App Store ids but not in my account?
 > Harvest last week's search terms into exact keywords and negatives, show me the plan first.
 > My weekly subscription utility app is at 3x target CPI. Where is the leak?
 > I'm launching a universal TV remote app. Build me a campaign structure.

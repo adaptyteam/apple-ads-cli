@@ -19,6 +19,7 @@ If you find yourself documenting a flag here, stop: that belongs upstream.
 
 ```bash
 node scripts/lint-playbooks.mjs   # contracts, command existence, skill portability
+node scripts/lint-workflows.mjs   # flagship workflow behavior and safety contracts
 node scripts/lint-i18n.mjs        # translation freshness
 ```
 

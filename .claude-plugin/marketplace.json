@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "apple-ads",
-      "description": "Run Apple Search Ads from your agent — analysis, bids, budgets, keywords, search-term harvesting and cohort ROAS through the Adapty CLI. Includes a planning skill that needs no account.",
+      "description": "Run and audit Apple Ads from your agent — cohort bid reviews, Market Intelligence keyword opportunities, search-term harvesting, negatives, CPP routing, and read-only account diagnostics through the Adapty CLI.",
       "source": "./",
       "category": "marketing",
       "homepage": "https://adapty.io/docs/developer-cli-ads-manager-skill"

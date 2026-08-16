@@ -1,61 +1,132 @@
 ---
-title: Weekly account review
-intent: user wants to know how the account did and what to do next
+title: Weekly account check-in
+intent: user wants to know what changed, what needs attention, and what to do next
 kind: procedural
 risk: read-only
 requires: { cli: ">=0.4.0", subscription: true }
 uses: [asa metrics overview, asa metrics, asa search-terms list]
-time: ~10 min
+time: ~15 min
 ---
 
-# Weekly account review
+# Weekly account check-in
 
-A whole week's review is **three to four calls**. The metrics budget is 5 per minute; a review that
-loops per campaign or per day exhausts it and then answers nothing.
+Turn one operating period into a short decision-ready report. The check-in is read-only: it may
+recommend one action, but a separate playbook and a separate confirmation execute it.
 
-## The four calls
+## Apply when
 
-1. **Account totals and the trend, in one call.** A per-period series already contains this week
-   and last week — never call once per period.
-   ```
-   adapty asa metrics overview --entity campaign --date-from <start> --date-to <end> --period-unit week
-   ```
-2. **Winners and losers at the level that matters.** One call, sorted server-side. `--order asc`
-   asks the same call for losers instead of winners.
-   ```
-   adapty asa metrics --entity campaign --date-from <start> --date-to <end> \
-     --order-by gross_roas --by-days 30 --order-by-day 30 --page-size 20
-   ```
-3. **One level down, only into what looked wrong in call 2.** Ad group, or keyword.
-4. **Search terms**, only if the review is going to end in a harvest →
-   `playbooks/search-term-harvesting.md`.
+- The user asks how the last week or month went.
+- The user wants the largest positive and negative changes and the next action.
+- A recurring operating review needs Apple performance and Adapty cohort value together.
 
-Counting anything ("how many active campaigns") is not a metrics call: any list at `--page-size 1`
-carries `meta.pagination.count`.
+## Do not apply when
 
-## What to actually report
+- The user wants a broad health or structure diagnosis → `apple-ads-audit`.
+- The user already chose a bid, negative, harvest, or CPP action → open that playbook.
+- The user asks for a deep attribution investigation. This playbook only compares install counts.
 
-Three things, in this order. Anything else is noise in a weekly.
+## Required inputs
 
-1. **Direction** — spend, installs and cohort ROAS versus the previous period, with the delta.
-2. **The two outliers** — the best and the worst performer at one level, with the number that makes
-   each one an outlier.
-3. **One recommended action**, with the playbook that executes it and what it would cost.
+Ask for any missing decision-changing input:
 
-## Definitions come from the user
+- exact report window;
+- whether to compare it with another period;
+- the success metric and revenue variant;
+- the cohort window that matches the app's subscription model;
+- any user-defined target or guardrail;
+- optional app or campaign focus.
 
-"Best-performing", "losing", "bad ROAS" are business definitions, not query results. Name the metric
-and the window, get an explicit yes, then rank. A review that silently picks its own definition of
-"losing" and recommends a pause is a review that will pause the wrong thing.
+If the user does not supply a business target, report facts and outliers without calling them good,
+bad, profitable, or unprofitable. Do not add an unrequested period comparison.
 
-## Baselines
+## Call budget
 
-If `apple-ads-benchmarks` is installed, compare the account's rates against its category before
-calling anything good or bad — and quote the period and sample size with the number. If it is not,
-compare the account against its own previous periods and say there is no external baseline.
+Use at most four analytics-family calls:
 
-## Never
+1. **Overview and trend.** One `metrics overview` call across the requested window. Request spend,
+   `total_installs`, `adapty_installs`, the selected cost metric, and the selected cohort root. A
+   per-period series already contains the comparison; never call once per period.
+2. **Campaign outliers.** One server-sorted campaign call using the user-approved metric, direction,
+   and cohort window.
+3. **Keyword outliers.** One server-sorted keyword call only when the campaign result warrants that
+   level or the user requested it.
+4. **Search terms.** One scoped call only when the report is expected to end in growth or waste
+   analysis.
 
-- Never sum pages yourself. The server aggregates.
-- Never add a period comparison the user did not ask for — propose it instead.
-- Never end a review with a write. A review recommends; a separate, confirmed step executes.
+Prefer one `--page-size 1000` response to pagination. Use the first and last rows as global extremes
+only when pagination metadata proves the full result fits in that response. Otherwise report the
+returned coverage and do not claim a global worst row.
+
+Counting entities is not an analytics call. A scoped list with `--page-size 1` already returns the
+count.
+
+## Simple Apple versus Adapty install comparison
+
+Use values from the same overview response and date window:
+
+```text
+apple_installs = total_installs
+adapty_installs = adapty_installs
+absolute_gap = apple_installs - adapty_installs
+relative_gap = absolute_gap / apple_installs  # only when apple_installs > 0
+```
+
+- Show both values and the signed absolute gap.
+- Show the percentage only when Apple installs are greater than zero.
+- Treat a missing value as unknown, not zero.
+- Explain in one sentence that Apple and Adapty use different attribution and event definitions, so
+  exact equality is not expected.
+- Do not assign fault or investigate attribution.
+
+## Decision method
+
+1. State the metric, date window, cohort window, and revenue variant before the result.
+2. Separate direct observations from explanations.
+3. Choose up to two positive changes and two concerns supported by the requested metric.
+4. Mark thin or immature cohorts `insufficient_data`.
+5. Recommend one primary action whose expected value and risk are explainable from the evidence.
+6. Put every other useful idea in a backlog; do not execute any of them.
+
+If change history is unavailable, say a configuration and a metric change "coincided". Never say
+one caused the other.
+
+## Output
+
+Return these sections in order:
+
+1. **Direction** — spend, Apple installs, Adapty installs, selected cost metric, and selected value
+   metric for the requested period or comparison.
+2. **Apple vs Adapty installs** — the limited same-window comparison above.
+3. **Two positive changes** — or fewer when evidence does not support two.
+4. **Two concerns** — confirmed observations, not invented failures.
+5. **Primary action** — one read-only recommendation and its operator playbook.
+6. **Backlog** — optional later checks.
+7. **Unknowns and confidence** — targets, maturity, scope, or unavailable causes.
+
+Every finding names evidence ids, entities, metrics, windows, confidence, and limitations.
+
+## Example
+
+```text
+Direction: spend rose 8% in the requested comparison while day-30 proceeds ROAS was flat.
+Apple vs Adapty installs: 540 vs 497, a gap of 43 (8.0% of Apple's count). The systems use
+different attribution and event definitions, so this is a comparison signal, not proof of an
+error. Primary action: review bids for the three mature keywords below the user's ROAS target.
+```
+
+## Failure modes
+
+- Different install windows invalidate the comparison.
+- Apple installs equal to zero makes the percentage undefined.
+- A monthly cohort read at day 7 is immature, not losing.
+- A server-sorted top page does not prove the global worst when more pages exist.
+- No user-defined target means no performance verdict and no mutation proposal.
+- A weekly check-in never ends with a write.
+
+## Related playbooks
+
+- Cohort window and value interpretation → `cohort-roas.md`.
+- Confirmed bid action → `bid-optimization.md`.
+- Query growth → `search-term-harvesting.md`.
+- Query waste → `negative-keyword-hygiene.md`.
+- CPP mismatch → `creative-setup.md`.

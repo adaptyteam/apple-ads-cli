@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md  i18n-hash: ae321f12529be9a0  -->
+<!-- i18n-source: README.md  i18n-hash: 7c1ea480b94019ca  -->
 
 [English](README.md) · [简体中文](README.zh-CN.md) · **Türkçe**
 
@@ -73,8 +73,9 @@ Ayarlar → Capabilities → kod çalıştırmayı etkinleştirin → ağ çık�
 | | |
 |---|---|
 | **`apple-ads`** | Uygulayıcı. Performansı okur, teklifleri ve bütçeleri değiştirir, anahtar kelime ve negatif ekler, arama terimlerini hasat eder, kampanyaları başlatır ve durdurur — hepsi CLI üzerinden ve para harcayan her işlemden önce onay alarak. |
+| **`apple-ads-audit`** | Salt okunur denetçi. Hesap sağlığını, yayın durumunu, canlı yapıyı, trafik sahipliğini, yinelenen tam eşleşmeli anahtar kelimeleri ve aynı tarih aralığında Apple ile Adapty kurulumlarının basit karşılaştırmasını kontrol eder. Hiçbir şeyi değiştirmez. |
 | **`apple-ads-strategy`** | Planlayıcı. **Hesap, CLI veya abonelik gerektirmez.** "Bir TV kumandası uygulamam var, nereden başlamalıyım" sorusunu eksiksiz bir hesap yapısına, anahtar kelime taksonomisine, başlangıç bütçesine ve negatif listesine dönüştürür. |
-| **Oyun kitapları** | Haftalık inceleme · kohort ROAS · arama terimi hasadı · teklif optimizasyonu · bütçe yeniden dağıtımı · kampanya başlatma · negatif anahtar kelime hijyeni · rakip takibi · kontrolsüz harcama · otomasyon kuralları. |
+| **Oyun kitapları** | Haftalık kontrol · hesap sağlığı · yapı denetimi · kohort ROAS · anahtar kelime teklif incelemesi · Market Intelligence fırsatları · arama terimi hasadı · negatif anahtar kelime madenciliği · CPP yönlendirme · bütçe yeniden dağıtımı · kampanya başlatma · kontrolsüz harcama · otomasyon kuralları. |
 | **Dikey rehberler** | Kategoriye özel oyun kitapları — talep profili, anahtar kelime taksonomisi, hesap yapısı, başlangıç ekonomisi ve o kategoriye özgü başarısızlık biçimleri. |
 
 Tüm oyun kitapları doğrudan burada, GitHub üzerinde okunabilir. Kullanmak için ne bir kurulum ne de bir Adapty hesabı gerekir.
@@ -85,6 +86,8 @@ Tüm oyun kitapları doğrudan burada, GitHub üzerinde okunabilir. Kullanmak i�
 
 ```
 > Geçen ay 30 günlük kohort ROAS'ına göre hangi reklam gruplarım zarar etti?
+> Bu canlı hesabı denetle ve ilgilenmem gerekenleri göster; hiçbir şeyi değiştirme.
+> Bu üç rakip App Store kimliğinde görünen, ancak hesabımda olmayan ABD arama terimleri hangileri?
 > Geçen haftanın arama terimlerini tam eşleşmeli anahtar kelimelere ve negatiflere dönüştür, önce planı göster.
 > Haftalık abonelikli araç uygulamamın CPI'ı hedefin 3 katı. Kaçak nerede?
 > Evrensel bir TV kumandası uygulaması çıkarıyorum. Bana bir kampanya yapısı kur.

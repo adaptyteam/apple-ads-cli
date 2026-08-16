@@ -22,169 +22,172 @@ Every number is either (a) sourced and linked, (b) marked as a range to calibrat
 or (c) marked TODO. Never write a confident number you cannot source: a made-up
 CPT benchmark is worse than no benchmark, because the agent will act on it.
 
-Slots to fill are marked `«...»`.
+Slots to fill are marked `[fill in]`.
 -->
 
-# «Category» — Apple Search Ads playbook
+# [Category] — Apple Search Ads playbook
 
-**One-line thesis.** «Что делает эту вертикаль непохожей на остальные — в одном предложении. Если не получается — вертикаль выделена неправильно.»
+**One-line thesis.** [Explain in one sentence what makes this vertical different from every other
+vertical. If that is not possible, it should not be a separate vertical.]
 
 ---
 
 ## 0. When this playbook does not apply
 
-«Границы. Например: не подходит приложениям без подписки; не подходит при бюджете ниже X; не подходит, если приложение ещё не прошло ревью.»
+[Define the boundaries. Examples: not for apps without subscriptions; not below budget X; not before
+the app has passed store review.]
 
-Читатель должен узнать себя или уйти в первые тридцать секунд.
+A reader should recognize that the guide applies to them or leave within thirty seconds.
 
 ---
 
 ## 1. Demand profile
 
-| Свойство | Значение | Следствие для рекламы |
+| Property | Value | Advertising implication |
 |---|---|---|
-| Тип намерения | «импульсный / решение задачи / исследование» | «влияет на длину триала и на то, работает ли Today-tab» |
-| Сезонность | «пики и провалы, с привязкой к событиям» | «когда поднимать бюджет, когда резать» |
-| Глубина поиска | «пользователь ищет 1 слово или фразу» | «важность broad vs exact» |
-| Доля переустановок | «низкая / высокая» | «redownloads искажают CPI, считать по new downloads» |
-| Гео-концентрация | «Tier-1 / глобально» | «где стартовать» |
+| Intent | [Impulse / urgent task / research] | [Effect on trial length and whether Today Tab can work] |
+| Seasonality | [Peaks and troughs tied to events] | [When to raise or reduce budget] |
+| Query depth | [One-word queries or longer phrases] | [Importance of broad versus exact match] |
+| Redownload share | [Low / high] | [Whether redownloads distort CPI and new downloads should be used] |
+| Geographic concentration | [Tier 1 / global] | [Where to launch first] |
 
 ---
 
 ## 2. Unit economics: what must add up
 
-Формула, по которой вертикаль вообще может быть прибыльной:
+State the formula that makes this vertical economically viable:
 
-```
-«CPI_допустимый = ARPU_на_день_N × конверсия_install→paid × запас_на_риск»
+```text
+allowable CPI = ARPU at day N × install-to-paid conversion × risk buffer
 ```
 
-| Вход | Откуда берётся | Значение |
+| Input | Source | Value |
 |---|---|---|
-| ARPU на день 30/90/180 | когорты Adapty | «диапазон или TODO» |
-| install → trial | своя аналитика | «...» |
-| trial → paid | бенчмарки категории | «ссылка на subscription-benchmarks или TODO» |
-| допустимый CPT | считается из строк выше | «...» |
+| Day-30/90/180 ARPU | Adapty cohorts | [Range or TODO] |
+| Install → trial | First-party analytics | [Fill in] |
+| Trial → paid | Category benchmarks | [Link to subscription benchmarks or TODO] |
+| Allowable CPT | Derived from the rows above | [Fill in] |
 
-> **Калибровка.** Все значения выше — стартовая гипотеза. После 7 дней открута пересчитай их
-> на своих данных: `references/playbooks/cohort-roas.md`.
+> **Calibration.** Treat every value above as a starting hypothesis. Recalculate it from first-party
+> data after seven days: `references/playbooks/cohort-roas.md`.
 
 ---
 
 ## 3. Keyword taxonomy
 
-Шесть корзин, у каждой — своя роль, свой потолок ставки и свой критерий успеха.
+Define six buckets, each with its own role, bid ceiling, and success criterion.
 
-| Корзина | Роль | Примеры seed | Ожидание |
+| Bucket | Role | Seed examples | Expectation |
 |---|---|---|---|
-| Brand (свой) | защита | «...» | высокий CR, низкий CPT |
-| Competitor | перехват | «...» | средний CR, высокий CPT |
-| Generic / category | объём | «...» | низкий CR, дорого |
-| Feature / job-to-be-done | намерение | «...» | лучший ROAS |
-| Long tail / misspelling | дешёвый объём | «...» | мало трафика, дёшево |
-| Brand третьих лиц (не конкуренты) | «зависит от вертикали» | «...» | ⚠️ см. блок рисков |
+| Own brand | Defense | [Fill in] | High CR, low CPT |
+| Competitor | Interception | [Fill in] | Moderate CR, high CPT |
+| Generic / category | Volume | [Fill in] | Low CR, expensive |
+| Feature / job to be done | Intent | [Fill in] | Best ROAS |
+| Long tail / misspelling | Low-cost volume | [Fill in] | Low traffic, inexpensive |
+| Third-party brand, not a competitor | [Depends on vertical] | [Fill in] | ⚠️ See the risk section |
 
 ---
 
 ## 4. Account structure
 
-Какие из четырёх типов кампаний Apple использовать и почему именно так для этой вертикали:
+Explain which Apple campaign types to use and why they fit this vertical:
 
-| Кампания | Тип | Ad groups | Ключи | Стартовый бюджет |
+| Campaign | Type | Ad groups | Keywords | Starting budget |
 |---|---|---|---|---|
-| «Brand» | Search Results | «...» | brand exact | «доля от общего» |
-| «Competitor» | Search Results | «...» | competitor exact | «...» |
-| «Discovery» | Search Results | broad + search match | — | «...» |
-| «Exact / scaling» | Search Results | по темам | harvested exact | «...» |
-| «Today tab» *(если применимо)* | Today Tab | — | — | «...» |
+| `Brand` | Search Results | [Fill in] | Brand exact | [Share of total] |
+| `Competitor` | Search Results | [Fill in] | Competitor exact | [Fill in] |
+| `Discovery` | Search Results | Broad + Search Match | — | [Fill in] |
+| `Exact / scaling` | Search Results | Split by theme | Harvested exact | [Fill in] |
+| `Today Tab` *(when applicable)* | Today Tab | — | — | [Fill in] |
 
-Разбиение на ad groups для этой вертикали: «по чему делим — по устройству, по бренду, по задаче».
+Define the ad-group split for this vertical: by device, brand, task, or another meaningful dimension.
 
 ---
 
 ## 5. Starting bids and budget
 
-> Это диапазоны для старта, а не бенчмарки. Реальные значения зависят от гео,
-> сезона и конкуренции в конкретную неделю.
+> These are calibration ranges, not benchmarks. Actual values depend on geography, seasonality, and
+> competition during the specific week.
 
-| Корзина | Стартовая ставка | Потолок | Правило пересмотра |
+| Bucket | Starting bid | Ceiling | Review rule |
 |---|---|---|---|
-| «...» | «диапазон или TODO» | «...» | «через сколько дней и по какому признаку» |
+| [Fill in] | [Range or TODO] | [Fill in] | [After how many days and based on which signal] |
 
-Минимальный бюджет, ниже которого обучение не наберёт статистику: «...»
+Minimum budget below which the campaign cannot collect enough data: [Fill in]
 
 ---
 
-## 6. Creative and Custom Product Pages
+## 6. Creative and custom product pages
 
-- Какие CPP имеют смысл для этой вертикали и под какие корзины ключей: «...»
-- Что должно быть на первых двух скриншотах: «...»
-- ⚠️ CPP создаются в App Store Connect; через API их можно только выбрать по `productPageId`.
+- Which CPPs make sense for this vertical and which keyword buckets should use them: [Fill in]
+- What the first two screenshots should show: [Fill in]
+- ⚠️ CPPs are created in App Store Connect. The API can only select one by `productPageId`.
 
 ---
 
 ## 7. Starter negative keywords
 
-Список, который экономит деньги с первого дня. Каждый негатив — с причиной.
+List the negatives that save money from day one and explain every entry.
 
-| Негатив | Почему |
+| Negative | Reason |
 |---|---|
-| «free» | «если монетизация — платная подписка без бесплатного тира» |
-| «...» | «...» |
+| `free` | [Use when monetization is a paid subscription with no free tier] |
+| [Fill in] | [Fill in] |
 
 ---
 
 ## 8. Launch sequence
 
-Пошагово, со ссылками на процедурные плейбуки. Сами команды живут там, а не здесь —
-это единственный способ не дублировать синтаксис CLI по двадцати гайдам.
+Provide ordered steps that link to procedural playbooks. Commands belong in those playbooks, not in
+this guide; that is the only way to avoid duplicating CLI syntax across many vertical guides.
 
-1. Проверить подключение и доступ → `playbooks/preflight.md`
-2. Создать структуру кампаний → `playbooks/campaign-launch.md`
-3. Залить стартовые ключи и негативы → `playbooks/keyword-load.md`
-4. Настроить правила → `playbooks/automation-rules.md`
-5. Первый разбор через 7 дней → `playbooks/weekly-review.md`
+1. Verify the connection and access → `playbooks/preflight.md`
+2. Create the campaign structure → `playbooks/campaign-launch.md`
+3. Load starting keywords and negatives → `playbooks/keyword-load.md`
+4. Configure automation rules → `playbooks/automation-rules.md`
+5. Run the first review after seven days → `playbooks/weekly-review.md`
 
 ---
 
 ## 9. Success criteria
 
-| Горизонт | Что смотрим | Порог «идём дальше» | Порог «режем» |
+| Horizon | Measure | Continue threshold | Cut threshold |
 |---|---|---|---|
-| День 7 | «...» | «...» | «...» |
-| День 30 | когортный ROAS | «...» | «...» |
-| День 90 | «...» | «...» | «...» |
+| Day 7 | [Fill in] | [Fill in] | [Fill in] |
+| Day 30 | Cohort ROAS | [Fill in] | [Fill in] |
+| Day 90 | [Fill in] | [Fill in] | [Fill in] |
 
 ---
 
 ## 10. Failure modes of this vertical
 
-Типовые способы слить бюджет именно здесь. Каждый — с признаком и с действием.
+List the category-specific ways to waste budget. Give each one an observable signal and a corrective
+action.
 
-| Провал | Как выглядит в цифрах | Что делать |
+| Failure | Signal | Corrective action |
 |---|---|---|
-| «...» | «...» | «...» |
+| [Fill in] | [Fill in] | [Fill in] |
 
 ---
 
 ## 11. Legal and policy risks
 
-«Только если вертикаль их несёт. Если нет — написать "нет специфических рисков",
-а не удалять раздел.»
+[Include this section only when the vertical carries specific risks. If it does not, write
+"No category-specific risks" rather than deleting the section.]
 
 ---
 
 ## 12. What to measure in Adapty
 
-Что именно из когортных метрик отвечает на вопрос «работает ли реклама» в этой вертикали
-и почему обычных метрик Apple здесь недостаточно: «...»
+[Identify the cohort metrics that answer whether advertising works in this vertical, and explain why
+standard Apple metrics are insufficient.]
 
 ---
 
-<!-- Checklist перед мержем:
-[ ] frontmatter заполнен, `uses` пуст или все команды существуют в cli-reference.md
-[ ] нет ни одного числа без источника, диапазона или TODO
-[ ] есть раздел 0 (когда не подходит)
-[ ] шаги запуска ссылаются на плейбуки, а не дублируют команды
-[ ] указана дата updated
+<!-- Pre-merge checklist:
+[ ] Frontmatter is complete; uses is empty or every command exists in the CLI reference
+[ ] Every number has a source, a calibration range, or a TODO
+[ ] Section 0 defines when the playbook does not apply
+[ ] Launch steps link to playbooks instead of duplicating commands
+[ ] The updated date is set
 -->
