@@ -11,7 +11,7 @@ The most useful contribution is a **vertical guide** for a category that has non
    benchmark is worse than none, because the agent will act on it.
 4. Add a row to `skills/apple-ads-strategy/references/INDEX.md`. A guide with no INDEX row is never
    opened.
-5. `node scripts/lint-playbooks.mjs` must pass.
+5. `node scripts/lint-playbooks.mjs` and `node scripts/lint-workflows.mjs` must pass.
 
 `verticals/utility-tv-remote.md` is the worked example. Imitate its section order and its discipline
 about numbers.

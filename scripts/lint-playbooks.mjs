@@ -12,7 +12,7 @@
 // Usage: node scripts/lint-playbooks.mjs
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
-import { join, relative, basename } from 'node:path'
+import { join, relative, basename, extname } from 'node:path'
 
 const ROOT = new URL('..', import.meta.url).pathname
 const errors = []
@@ -78,6 +78,7 @@ for (const m of refText.matchAll(/`?asa\s+([a-z-]+)(?:\s+([a-z-]+))?/g)) {
 // ---- 2. Walk every contract-bearing file ---------------------------------------------
 const targets = [
   { dir: join(ROOT, 'skills/apple-ads/references/playbooks'), kind: 'procedural', index: join(ROOT, 'skills/apple-ads/references/INDEX.md') },
+  { dir: join(ROOT, 'skills/apple-ads-audit/references/playbooks'), kind: 'procedural', index: join(ROOT, 'skills/apple-ads-audit/references/INDEX.md') },
   { dir: join(ROOT, 'skills/apple-ads-strategy/references/verticals'), kind: 'vertical', index: join(ROOT, 'skills/apple-ads-strategy/references/INDEX.md') },
 ]
 
@@ -140,6 +141,36 @@ for (const s of readdirSync(skillsDir)) {
     if (!PORTABLE_FRONTMATTER.has(k)) {
       fail(path, `frontmatter field "${k}" is Claude-Code-only and fails validation when this skill is packaged for claude.ai / the Skills API`)
     }
+  }
+}
+
+// ---- 4. Public repository text must not contain Cyrillic -----------------------------
+const CYRILLIC = /[\u0400-\u04FF]/u
+const TEXT_EXTENSIONS = new Set(['.json', '.md', '.mjs', '.sh', '.yaml', '.yml'])
+
+function textFiles(dir) {
+  if (!existsSync(dir)) return []
+  const files = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name)
+    if (entry.isDirectory()) files.push(...textFiles(path))
+    else if (TEXT_EXTENSIONS.has(extname(entry.name))) files.push(path)
+  }
+  return files
+}
+
+const publicTextFiles = [
+  ...['.claude-plugin', '.github', 'commands', 'docs', 'examples', 'scripts', 'skills']
+    .flatMap((dir) => textFiles(join(ROOT, dir))),
+  ...readdirSync(ROOT)
+    .filter((file) => file.endsWith('.md'))
+    .map((file) => join(ROOT, file)),
+]
+
+for (const file of publicTextFiles) {
+  const lines = readFileSync(file, 'utf8').split('\n')
+  for (const [index, line] of lines.entries()) {
+    if (CYRILLIC.test(line)) fail(file, `line ${index + 1} contains Cyrillic; public repository text must be English`)
   }
 }
 

@@ -1,6 +1,6 @@
 ---
 name: apple-ads
-description: Use when running Apple Search Ads through the Adapty CLI — reading campaign, ad group, keyword or ad performance, cohort ROAS, changing bids or budgets, adding or pausing keywords, launching or pausing a campaign, harvesting search terms, or setting up rule-based ad automations. Requires the adapty CLI and an Adapty account; for planning a launch without an account use apple-ads-strategy instead.
+description: Use when operating a connected Apple Ads account through the Adapty CLI — weekly check-ins, cohort and keyword bid reviews, competitor keyword opportunities from Market Intelligence, search-term harvesting, negative-keyword mining, CPP routing, bids, budgets, keywords, campaigns, and rule automations. Requires the adapty CLI and an Adapty account. Use apple-ads-audit for read-only account health or live structure diagnostics, and apple-ads-strategy for planning without an account.
 license: MIT
 ---
 
@@ -37,6 +37,10 @@ the workflows below carry the command shapes. Read the playbook first, then come
 For "how should I structure this account", "which keywords should I even start with", or any
 question that precedes having an account, that is the `apple-ads-strategy` skill, not this one.
 
+For "what is broken in this live account", a broad health check, duplicate Exact ownership, or
+missing cross-negatives, use the read-only `apple-ads-audit` skill. A weekly operating check-in stays
+here. Do not make audit and operator compete for the same request.
+
 ## Two things about how you answer
 
 - **Answer in the language the user writes in.** Everything in this skill is English; translate your
@@ -44,6 +48,24 @@ question that precedes having an account, that is the `apple-ads-strategy` skill
 - **Category baselines.** If the `apple-ads-benchmarks` skill is available, use it for what "normal"
   looks like in this app's niche before calling a number good or bad. If it is not installed, say
   there is no baseline and compare the account against its own history instead — never invent one.
+
+## Analysis and proposal contract
+
+Every recurring workflow returns `summary`, `scope`, `date_window`, `findings`, `evidence`,
+`confidence`, `unknowns`, and `recommended_actions`. A finding separates the observed value from
+its explanation and names the metric, entity id, date window, and cohort window behind it.
+
+A workflow that may write also shows a mutation proposal before asking for confirmation:
+
+- target entity and current state;
+- proposed state;
+- reason and evidence;
+- expected effect and risk;
+- whether the CLI provides a rollback;
+- `requires_confirmation: true`.
+
+Low confidence never produces a mutation. `unknown` is not a failure. Do not turn several controls
+into a made-up score.
 
 ## Account surface
 
@@ -213,21 +235,18 @@ adapty asa ads create --ad-group <id> --creative-id <id> --name <name> --idempot
 adapty asa keywords add --ad-group <id> --text <keyword> --match-type <EXACT|BROAD> --idempotency-key <run>-kw-1   # ≤15 per call, fresh key per batch
 ```
 
-**4. Harvest keywords.** Read `search-terms list --ad-group <id> --date-from <YYYY-MM-DD>
---date-to <YYYY-MM-DD>` (dates default to today, so pass them), then
-promote converting terms with `keywords add --ad-group <id>` and block wasteful ones with
-`negative-keywords add --ad-group <id>` — 15 per call, own key per call. →
-`references/asa-metrics.md`, `## The analytics pool`, and `references/asa-management.md`.
+**4. Harvest keywords.** Read the dated, scoped search terms plus the destination's positive and
+negative inventory. Resolve the current and intended Exact owner before writing. Add and verify the
+new Exact owner before adding a narrow cross-negative to the source. Keep promote, block, observe,
+already-owned, conflict, and insufficient-evidence rows separate. Maximum 15 additions per call,
+with a fresh key per call. → `references/playbooks/search-term-harvesting.md`.
 
-**5. Optimization pass.** Read `metrics --entity keyword --date-from <YYYY-MM-DD> --date-to
-<YYYY-MM-DD> --by-days 7 --by-days 90 --order-by gross_roas --order-by-day 90` — `--order asc` asks
-that same call for the losers instead of the winners — and `keywords list --ad-group <id> --status
-ACTIVE` for ids. Get the user's
-cutoff before any write. Then `keywords update <ids> --bid <amount>` on winners,
-`keywords update <ids> --status PAUSED` on losers, `campaigns update <id> --daily-budget <n>` to
-shift spend — each with its own `--idempotency-key`. Confirm the budget separately from the
-bids; separate decisions. → `references/asa-metrics.md`, `## Cohort windows`, and
-`references/asa-management.md`.
+**5. Keyword bid review.** Choose the cohort window from the monetization model, read keyword
+metadata, then rank with one server-side metrics call using the user's success metric and target.
+Separate increase, keep, decrease, pause-candidate, and insufficient-data rows. Without a target,
+report outliers but do not write. Group identical approved changes, use a fresh idempotency key per
+write, and read back the keyword state. Budget changes are a separate decision. →
+`references/playbooks/bid-optimization.md`.
 
 **6. Pause or resume.** Campaigns, ad groups, ads:
 `update <id> --status ENABLED|PAUSED --idempotency-key <key>`. Keywords:
@@ -235,11 +254,11 @@ bids; separate decisions. → `references/asa-metrics.md`, `## Cohort windows`, 
 from every other entity's, and there is no `DISABLED` anywhere in the surface. Ids come from a
 scoped list first. → `references/asa-management.md`, `## Status`.
 
-**7. Custom product page → ad.** `product-pages sync [--adam-id <adam-id>] --idempotency-key <key>`
-— a write, queued rather than awaited. Then `product-pages list --app <app-uuid>` →
-`creatives list --app <app-uuid>` →
-`ads create --ad-group <id> --creative-id <id> --name <name> --idempotency-key <key>`. →
-`references/asa-management.md`.
+**7. CPP routing.** Resolve the query intent, existing product pages, creatives, and ads before
+choosing a page. Sync only when the catalog is missing or stale, and confirm that write separately.
+An ad's creative cannot be changed: create and verify a new ad, then pause an old ad only through a
+second confirmation. The CLI selects an existing CPP; it does not edit one. →
+`references/playbooks/creative-setup.md`.
 
 **8. Diagnose a dead ad.** `ads get <id>`, read `serving_state_reasons`; if that does not
 explain it, walk up to `ad-groups get <id>` status, then `campaigns get <id>` status and daily
@@ -250,9 +269,12 @@ budget. All reads. → `references/asa-management.md`.
 `automations update <id> --start`, only after the user has seen that outcome. Dry-run every rule
 touching a bid or a budget. → `references/asa-management.md`.
 
-**10. Competitor check.** `competitors summary --app-ids <adam-id>,<adam-id>` — **1–5** Apple
-App Store IDs. Last full month, every country; no period or country flags exist. Read-only, shares
-the analytics pool, slow on a cold cache. → `references/asa-metrics.md`.
+**10. Competitor keyword opportunities.** Read up to five App Store ids in one
+`competitors summary --json` call. The full response carries per-app, per-country terms and SOV;
+the endpoint covers the last full month and every country. Compare those terms with the account's
+active, paused, and negative keyword inventory. Never claim competitor bids, spend, conversions, or
+profitability from this data. Keyword creation is a separately confirmed step. →
+`references/playbooks/keyword-opportunity.md`.
 
 ## Anything not covered here
 

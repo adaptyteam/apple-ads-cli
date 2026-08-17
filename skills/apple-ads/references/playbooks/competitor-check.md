@@ -1,32 +1,24 @@
 ---
-title: Competitor check
-intent: user wants to see how competitors are doing
+title: Legacy competitor-check redirect
+intent: preserve old links while routing every competitor keyword request to keyword-opportunity
 kind: procedural
 risk: read-only
 requires: { cli: ">=0.4.0", subscription: true }
-uses: [asa competitors summary]
-time: TODO
+uses: []
+time: <1 min
 ---
 
-# Competitor check
+# Legacy redirect
 
-> **Stub.** The contract above is real and the linter checks it; the body is not written yet.
-> Until it is, follow `SKILL.md` — its numbered workflows cover the command shapes — and treat
-> the checklist below as the outline to fill in.
+This path is retained so existing links do not break. It contains no workflow and must not issue a
+CLI call.
 
-## To write
+Open `keyword-opportunity.md` and follow it as the single source of truth for:
 
-- [ ] When this playbook applies, and when it does not
-- [ ] The minimum number of reads that answer the question
-- [ ] How the decision is made, and which parts are the user's call rather than yours
-- [ ] What to show before writing, and what an explicit confirmation looks like here
-- [ ] The write commands, batching and `--idempotency-key` discipline
-- [ ] How to verify it landed
-- [ ] The failure modes specific to this job
+- per-app, per-country Market Intelligence terms;
+- SOV interpretation;
+- active, paused, and negative inventory comparison;
+- opportunity classification;
+- the separate keyword-add confirmation boundary.
 
-## Rules that already apply
-
-- Every write is previewed and confirmed. `--yes` only on a command you run yourself.
-- 15 keywords per call; a fresh idempotency key per call.
-- Metrics: 5 calls/min, at most 2 per 10s. Plan the whole answer inside that.
-- No delete exists. `--status PAUSED` is the only stop.
+Do not summarize competitors from this redirect. Do not maintain decision rules in both files.

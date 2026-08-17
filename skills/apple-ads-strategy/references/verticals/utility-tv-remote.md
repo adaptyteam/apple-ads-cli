@@ -13,193 +13,229 @@ updated: 2026-08-16
 
 # Universal TV Remote — Apple Search Ads playbook
 
-**Тезис.** Это вертикаль с самым высоким намерением и самой низкой ценой ошибки таргетинга во всём App Store: человек ищет пульт, потому что пульт потерялся прямо сейчас, и купит в первые две минуты — но слово «remote» одновременно значит «удалённая работа», «удалённый рабочий стол» и «пульт от гаража», и на этих трёх смыслах утекает больше бюджета, чем на всех остальных ошибках вместе взятых.
+**Thesis.** This vertical combines some of the highest intent with some of the cheapest targeting
+mistakes in the App Store. A person searches for a remote because the physical remote is missing
+right now and may buy within two minutes. But "remote" also means remote work, remote desktop, and a
+garage-door remote, and those three meanings can waste more budget than every other targeting error
+combined.
 
 ---
 
-## 0. Когда этот плейбук не подходит
+## 0. When this playbook does not apply
 
-- Приложение без подписки или с разовой покупкой — вся экономика ниже построена на когортной выручке.
-- Пульт для одного бренда, идущий в связке с железом производителя: там работает брендовый трафик самого производителя, а не конкуренция за generic-запросы.
-- Приложение ещё не в сторе или не прошло ревью: ASA не запускается на неопубликованном листинге.
-- Бюджет ниже порога, при котором Discovery-кампания не наберёт статистику за неделю → см. §5.
+- The app has no subscription or uses a one-time purchase; all economics below are based on cohort
+  revenue.
+- The app controls one brand and ships with that manufacturer's hardware; manufacturer-owned brand
+  traffic behaves differently from competition for generic queries.
+- The app is not live in the store or has not passed review; Apple Ads cannot advertise an
+  unpublished listing.
+- The budget is below the level at which a Discovery campaign can collect useful data within one
+  week; see §5.
 
 ---
 
-## 1. Профиль спроса
+## 1. Demand profile
 
-| Свойство | Значение | Следствие для рекламы |
+| Property | Value | Advertising implication |
 |---|---|---|
-| Тип намерения | Решение задачи, острое и немедленное | Окно конверсии — минуты. Триал короткий, пейволл ранний. Исследовательских касаний нет |
-| Сезонность | Пики: конец декабря и первая неделя января (новые ТВ под праздники), Чёрная пятница, крупные спортивные события, летний сезон отпусков (телевизоры в отелях и апартаментах) | Бюджет планируется всплесками, а не ровной линией. Ставки в пик растут у всех одновременно |
-| Глубина поиска | Одно-два слова, часто с названием бренда телевизора | Exact по брендам железа — основная корзина, не вспомогательная |
-| Доля переустановок | Высокая: приложение удаляют, решив задачу, и ставят снова через полгода | `total_installs` систематически завышает результат. Считать по `total_new_downloads` и `tap_new_downloads` |
-| Гео | Глобально, но платёжеспособность сильно расслоена | Tier-1 стартует первым; Tier-2/3 включаются только после того, как когорта Tier-1 сошлась |
+| Intent | Urgent, immediate task resolution | The conversion window is measured in minutes. Use a short trial and an early paywall; there is no research journey |
+| Seasonality | Peaks in late December and early January, Black Friday, major sporting events, and summer travel when people use hotel and rental TVs | Plan budget in bursts rather than as a flat line. Bids rise across the market during peaks |
+| Query depth | One or two words, often including a TV brand | Exact-match hardware-brand queries are the primary bucket, not a supporting one |
+| Redownload share | High: users delete the app after solving the problem and reinstall it months later | `total_installs` systematically overstates acquisition. Evaluate `total_new_downloads` and `tap_new_downloads` |
+| Geography | Global demand with sharply different purchasing power | Start with Tier 1. Add Tier 2 and Tier 3 only after the Tier-1 cohort economics work |
 
-Отдельная особенность: это **редкая утилита, где намерение выражается брендом чужого продукта**. Пользователь ищет не «пульт», а «пульт для самсунга». Это определяет всю структуру аккаунта в §4.
+This is a **rare utility category where intent is expressed through somebody else's product brand**.
+The user searches for "Samsung TV remote," not simply "remote." That fact determines the account
+structure in §4.
 
 ---
 
-## 2. Юнит-экономика: что должно сойтись
+## 2. Unit economics: what must work
 
+```text
+allowable CPI = ARPU at day N × (install → paid rate) × risk buffer
 ```
-допустимый CPI = ARPU_на_день_N × (install → paid) × запас_на_риск
-```
 
-Вертикаль сложна тем, что все три множителя работают против вас: чек низкий, подписки чаще недельные, а отток после решения задачи высокий. Значит вся выручка когорты набирается в первые недели, и решение о масштабировании принимается по короткому горизонту.
+All three factors work against this vertical: prices are low, subscriptions are often weekly, and
+users churn quickly after solving the immediate problem. Most cohort revenue therefore arrives in
+the first few weeks, so scaling decisions use a short horizon.
 
-| Вход | Откуда | Значение |
+| Input | Source | Value |
 |---|---|---|
-| ARPU на день 7 и 30 | когорты Adapty, `--by-days 7,30` | > TODO(owner): подставить из бенчмарков категории Utilities |
-| install → trial | своя аналитика | > TODO(owner) |
-| trial → paid | бенчмарки категории | > TODO(owner): ссылка на `subscription-benchmarks`, сегмент Utilities, недельные подписки |
-| доля переустановок | `total_redownloads / total_installs` | считается из своих данных на 7-й день |
-| допустимый CPT | производная от строк выше | считается, не берётся из головы |
+| Day-7 and day-30 ARPU | Adapty cohorts, `--by-days 7,30` | > TODO(owner): fill from Utilities benchmarks |
+| Install → trial | First-party analytics | > TODO(owner) |
+| Trial → paid | Category benchmarks | > TODO(owner): link to `subscription-benchmarks`, Utilities, weekly subscriptions |
+| Redownload share | `total_redownloads / total_installs` | Calculate from first-party day-7 data |
+| Allowable CPT | Derived from the rows above | Calculate it; never guess |
 
-> **Практическое следствие.** В вертикалях с длинным LTV можно потерпеть отрицательный ROAS месяц.
-> Здесь нельзя: если когорта не сошлась к 30-му дню, она не сойдётся вообще. Горизонт принятия
-> решения — 30 дней, не 180.
+> **Practical consequence.** A long-LTV category can tolerate negative ROAS for a month. This
+> category cannot. If a cohort has not converged by day 30, it is unlikely to recover. Use a 30-day
+> decision horizon, not 180 days.
 
 ---
 
-## 3. Таксономия ключевых слов
+## 3. Keyword taxonomy
 
-| Корзина | Роль | Примеры seed | Ожидание |
+| Bucket | Role | Seed examples | Expectation |
 |---|---|---|---|
-| **Бренд железа** (главная) | Максимальное намерение | `samsung tv remote`, `lg tv remote`, `roku remote`, `vizio remote`, `sony bravia remote`, `fire tv remote`, `tcl remote`, `hisense remote` | Лучший CR и лучший ROAS во всей вертикали. Сюда идёт основной бюджет |
-| **Generic** | Объём | `tv remote`, `universal remote`, `remote control`, `remote for tv` | Дорого, CR ниже, но объём не заменить ничем |
-| **Функция / задача** | Смежное намерение | `screen mirroring`, `cast to tv`, `phone as tv remote`, `tv controller app` | Часто недооценена: дешевле бренда, намерение почти такое же |
-| **Свой бренд** | Защита | название приложения и его опечатки | Дёшево, обязательно: иначе на вашем имени сидит конкурент |
-| **Бренд конкурента** | Перехват | названия конкурирующих приложений | Средний CR, дорогой CPT, проверять окупаемость отдельно |
-| **Опечатки и длинный хвост** | Дешёвый объём | `samsng tv remote`, `remote for samsung smart tv 2020` | Мало трафика, но CPT заметно ниже |
+| **Hardware brand** (primary) | Highest intent | `samsung tv remote`, `lg tv remote`, `roku remote`, `vizio remote`, `sony bravia remote`, `fire tv remote`, `tcl remote`, `hisense remote` | Best CR and ROAS in the vertical; allocate the largest share of budget here |
+| **Generic** | Volume | `tv remote`, `universal remote`, `remote control`, `remote for tv` | Expensive and lower-converting, but no other bucket replaces its volume |
+| **Function or task** | Adjacent intent | `screen mirroring`, `cast to tv`, `phone as tv remote`, `tv controller app` | Often undervalued: cheaper than brand traffic with nearly the same intent |
+| **Own brand** | Defense | App name and common misspellings | Cheap and mandatory; otherwise a competitor can capture searches for your name |
+| **Competitor brand** | Interception | Competing app names | Moderate CR and expensive CPT; evaluate profitability separately |
+| **Misspellings and long tail** | Low-cost volume | `samsng tv remote`, `remote for samsung smart tv 2020` | Low volume, but often materially cheaper CPT |
 
-**Разделение по бренду железа — не косметика, а главный рычаг вертикали.** CR и CPT по `samsung tv remote` и `roku remote` отличаются достаточно, чтобы усреднённая ставка теряла деньги на обеих. Плюс под каждый бренд можно поставить свой CPP (§6), а это самый сильный множитель конверсии здесь.
+**Splitting by hardware brand is the main optimization lever, not cosmetic structure.** CR and CPT
+for `samsung tv remote` and `roku remote` can differ enough that one averaged bid loses money on both.
+A dedicated custom product page (CPP) per brand is also possible (§6), which is the strongest
+conversion multiplier in this vertical.
 
 ---
 
-## 4. Структура аккаунта
+## 4. Account structure
 
-| Кампания | Тип | Ad groups | Ключи | Роль |
+| Campaign | Type | Ad groups | Keywords | Role |
 |---|---|---|---|---|
-| `Brand` | Search Results | 1 | свой бренд + опечатки, exact | Защита имени |
-| `Device brands` | Search Results | **по одному на бренд ТВ** | exact по бренду | Основной драйвер. Отдельная ставка и отдельный CPP на бренд |
-| `Generic` | Search Results | по смыслу (`remote`, `universal`, `control`) | exact | Объём, жёсткий потолок ставки |
-| `Function` | Search Results | по задаче (`mirroring`, `cast`) | exact | Недооценённая корзина |
-| `Competitors` | Search Results | 1–2 | exact по названиям приложений | Перехват, считается отдельно |
-| `Discovery` | Search Results | broad + Search Match | — | **Только источник поисковых запросов.** Не канал закупки |
+| `Brand` | Search Results | 1 | Own brand and misspellings, exact | Defend the app name |
+| `Device brands` | Search Results | **One per TV brand** | Hardware-brand queries, exact | Primary driver; use a separate bid and CPP for each brand |
+| `Generic` | Search Results | Split by intent (`remote`, `universal`, `control`) | Exact | Volume with a hard bid ceiling |
+| `Function` | Search Results | Split by task (`mirroring`, `cast`) | Exact | Undervalued adjacent bucket |
+| `Competitors` | Search Results | 1–2 | Competing app names, exact | Interception; evaluate separately |
+| `Discovery` | Search Results | Broad + Search Match | — | **Search-term source only**, not an acquisition channel |
 
-Today Tab в этой вертикали, как правило, не окупается: там нет выраженного намерения, а допустимый CPI слишком низкий, чтобы платить за охват. Проверять — только после того, как Search Results вышел в плюс.
+Today Tab usually does not pay back in this vertical: it has no explicit intent, while allowable CPI
+is too low to buy broad reach. Test it only after Search Results is profitable.
 
-**Discovery здесь — не кампания роста, а датчик.** Её задача — приносить поисковые запросы для харвестинга, а не установки. Бюджет — минимальный из осмысленных, негативы — агрессивные, всё найденное уезжает в exact-кампании. Без этого правила Discovery в вертикали со словом «remote» съедает бюджет быстрее, чем вы успеваете посмотреть отчёт.
+**Discovery is a sensor, not a growth campaign.** Its job is to produce search terms for harvesting,
+not installs. Keep the budget at the smallest meaningful level, apply aggressive negatives, and move
+every useful query into an exact-match campaign. Without this rule, the multiple meanings of
+"remote" consume budget faster than the reporting loop can react.
 
 ---
 
-## 5. Стартовые ставки и бюджет
+## 5. Starting bids and budget
 
-> Диапазоны ниже — стартовая гипотеза для калибровки, а не бенчмарк.
+> The ranges below are calibration hypotheses, not benchmarks.
 
-| Корзина | Стартовая ставка | Потолок | Когда пересматривать |
+| Bucket | Starting bid | Ceiling | Review cadence |
 |---|---|---|---|
-| Свой бренд | > TODO(owner) | низкий | раз в месяц |
-| Бренд железа | > TODO(owner) | до допустимого CPT | каждые 3–4 дня в первые две недели |
-| Generic | > TODO(owner) | жёсткий, ниже бренда | еженедельно |
-| Функция | > TODO(owner) | средний | еженедельно |
-| Конкуренты | > TODO(owner) | по факту окупаемости | еженедельно |
-| Discovery | минимальная | минимальный | не масштабировать никогда |
+| Own brand | > TODO(owner) | Low | Monthly |
+| Hardware brand | > TODO(owner) | Up to allowable CPT | Every 3–4 days during the first two weeks |
+| Generic | > TODO(owner) | Hard ceiling below hardware-brand bids | Weekly |
+| Function | > TODO(owner) | Medium | Weekly |
+| Competitors | > TODO(owner) | Based on measured profitability | Weekly |
+| Discovery | Minimum | Minimum | Never scale |
 
-Минимальный дневной бюджет: такой, чтобы каждая ad group набрала статистически значимое число установок за 7 дней. Если бюджета хватает только на одну корзину — начинать с брендов железа, а не с generic: там дешевле подтвердить гипотезу.
-
----
-
-## 6. Креативы и Custom Product Pages
-
-Самый сильный неочевидный рычаг вертикали: **свой CPP под каждый бренд телевизора.** Человек, ищущий `samsung tv remote`, на первом скриншоте должен увидеть интерфейс пульта, похожий на самсунговский. Совпадение картинки с ожиданием даёт прирост конверсии, которого не даст никакая работа со ставками.
-
-- Первые два скриншота: интерфейс пульта, а не маркетинговый коллаж. Задача — узнавание за полсекунды.
-- Список поддерживаемых брендов виден без прокрутки.
-- ⚠️ CPP создаются в App Store Connect. Через API их можно только выбрать по `productPageId` — создать нельзя.
-- ⚠️ Текст и графика CPP с чужими товарными знаками — зона риска, см. §11.
+The minimum daily budget must let each ad group collect a statistically meaningful number of installs
+within seven days. If the budget supports only one bucket, start with hardware brands rather than
+generic terms; they validate the economics at lower cost.
 
 ---
 
-## 7. Стартовые негативы
+## 6. Creatives and custom product pages
 
-Ключевой список этой вертикали. Слово «remote» многозначно, и без этих негативов Discovery утекает в чужую семантику с первого дня.
+The strongest non-obvious lever is a **dedicated CPP for each TV brand**. A user searching
+`samsung tv remote` should see a Samsung-like remote interface in the first screenshot. Matching the
+creative to the expectation can improve conversion more than bid optimization.
 
-| Негатив | Почему |
+- Show the remote UI in the first two screenshots, not a marketing collage. Recognition should take
+  less than a second.
+- Make the supported-brand list visible without scrolling.
+- ⚠️ Create CPPs in App Store Connect. The API can only select an existing page by `productPageId`;
+  it cannot create one.
+- ⚠️ CPP text and graphics containing third-party trademarks are a legal-risk area; see §11.
+
+---
+
+## 7. Starting negatives
+
+This list is essential because "remote" is highly ambiguous. Without these negatives, Discovery
+starts buying unrelated intent on day one.
+
+| Negative | Reason |
 |---|---|
-| `remote work`, `remote job`, `work from home` | Совершенно другая аудитория, большой объём, ноль конверсии |
-| `remote desktop`, `remote access`, `rdp`, `vnc`, `teamviewer` | Второй по объёму паразитный кластер |
-| `car remote`, `key fob`, `garage remote`, `gate remote` | Другой тип устройства |
-| `drone remote`, `rc car` | То же |
-| `ac remote`, `air conditioner` | Только если кондиционеры действительно не поддерживаются |
-| `free`, `free download` | Если монетизация — платная подписка без бесплатного тира |
-| Бренды ТВ, которые вы **не** поддерживаете | Установка будет, удаление тоже, деньги потеряны |
+| `remote work`, `remote job`, `work from home` | Different audience, high volume, effectively no conversion |
+| `remote desktop`, `remote access`, `rdp`, `vnc`, `teamviewer` | The second-largest irrelevant cluster |
+| `car remote`, `key fob`, `garage remote`, `gate remote` | Different device type |
+| `drone remote`, `rc car` | Different device type |
+| `ac remote`, `air conditioner` | Exclude only when air conditioners are unsupported |
+| `free`, `free download` | Use when monetization is a paid subscription with no free tier |
+| TV brands the app does **not** support | The install may happen, but the user will churn and produce no value |
 
-Последняя строка — самая недооценённая. Установка от пользователя с неподдерживаемым телевизором стоит столько же, сколько от поддерживаемого, а стоит ноль.
-
----
-
-## 8. Последовательность запуска
-
-Команды живут в процедурных плейбуках — здесь только порядок.
-
-1. Проверить подключение и права → `playbooks/preflight.md`
-2. Создать кампании и ad groups по §4 → `playbooks/campaign-launch.md`
-3. Залить ключи по §3 и негативы по §7 → `playbooks/keyword-load.md`
-4. Привязать CPP к брендовым ad groups → `playbooks/creative-setup.md`
-5. Правила: стоп по перерасходу, стоп по нулевой конверсии → `playbooks/automation-rules.md`
-6. День 3: харвест поисковых запросов из Discovery → `playbooks/search-term-harvesting.md`
-7. День 7: первый разбор когорты → `playbooks/cohort-roas.md`
+The last row is commonly missed. An install from an unsupported-TV owner costs the same as a
+supported one and is worth zero.
 
 ---
 
-## 9. Критерии успеха
+## 8. Launch sequence
 
-| Горизонт | Что смотрим | Идём дальше | Режем |
+Execution commands live in the procedural playbooks; this section defines only the order.
+
+1. Verify the connection and permissions → `playbooks/preflight.md`
+2. Create the campaigns and ad groups from §4 → `playbooks/campaign-launch.md`
+3. Load the keywords from §3 and negatives from §7 → `playbooks/keyword-load.md`
+4. Attach CPPs to hardware-brand ad groups → `playbooks/creative-setup.md`
+5. Configure overspend and zero-conversion stop rules → `playbooks/automation-rules.md`
+6. Day 3: harvest Discovery search terms → `playbooks/search-term-harvesting.md`
+7. Day 7: run the first cohort review → `playbooks/cohort-roas.md`
+
+---
+
+## 9. Success criteria
+
+| Horizon | Measure | Continue | Cut or fix |
 |---|---|---|---|
-| День 3 | Доля паразитного трафика в поисковых запросах Discovery | падает после харвеста | остаётся высокой → негативы не работают, чинить их, а не ставки |
-| День 7 | `tap_install_cpi` по брендовым ad groups против допустимого CPT; `trials_started` | CPI в пределах гипотезы | > TODO(owner): порог |
-| День 30 | Когортный ROAS (`gross_roas`, `--by-days 30`) по корзинам | ≥ целевого | ниже — корзина не масштабируется, а не «нужно больше времени» |
-| День 90 | Устойчивость когорты и доля продлений | подтверждает день 30 | расхождение → проблема в удержании, не в рекламе |
+| Day 3 | Share of irrelevant Discovery search terms | Falls after harvesting | Remains high: fix negatives, not bids |
+| Day 7 | `tap_install_cpi` for hardware-brand ad groups versus allowable CPT; `trials_started` | CPI remains inside the hypothesis | > TODO(owner): define threshold |
+| Day 30 | Cohort ROAS (`gross_roas`, `--by-days 30`) by bucket | At or above target | Below target: do not scale the bucket; more time is unlikely to fix it |
+| Day 90 | Cohort stability and renewal share | Confirms the day-30 conclusion | Diverges: investigate retention rather than acquisition |
 
 ---
 
-## 10. Типовые провалы вертикали
+## 10. Common failure modes
 
-| Провал | Как выглядит в цифрах | Что делать |
+| Failure | Signal | Corrective action |
 |---|---|---|
-| Паразитная семантика «remote» | Высокие impressions и taps, низкий install rate, конверсия в триал почти нулевая | Негативы из §7 до запуска, не после |
-| Переустановки принимают за рост | `total_installs` растёт, `total_new_downloads` стоит | Оценивать только по new downloads; redownload — не приобретение |
-| Усреднённая ставка по всем брендам ТВ | Часть брендов не показывается, часть переплачивает | Отдельная ad group и ставка на бренд |
-| Discovery масштабируют как канал | Расход растёт, ROAS падает | Discovery — датчик, а не канал. Потолок бюджета фиксированный |
-| Решение по когорте на 7-й день | Недельная подписка ещё не продлилась ни разу | Решение о масштабировании — на 30-й день |
-| Сезонный пик не заложен в бюджет | Ставки выросли у всех, показы просели, отчёт выглядит как деградация | Планировать всплески заранее, сравнивать с тем же периодом прошлого года |
-| Неподдерживаемые модели | Нормальный CPI, обвал удержания на первый день | Негативы по брендам и явный список поддержки в CPP |
+| Irrelevant meanings of "remote" | High impressions and taps, low install rate, almost no trial conversion | Apply the §7 negatives before launch |
+| Redownloads counted as growth | `total_installs` rises while `total_new_downloads` is flat | Evaluate new downloads only; a redownload is not acquisition |
+| One averaged bid across all TV brands | Some brands receive no impressions while others overpay | Use a separate ad group and bid for each brand |
+| Discovery scaled as a channel | Spend rises while ROAS falls | Treat Discovery as a sensor and keep a fixed budget ceiling |
+| Cohort decision made on day 7 | A weekly subscription has not renewed yet | Make the scaling decision on day 30 |
+| Seasonal peak omitted from planning | Market bids rise, impressions fall, and reporting looks like degradation | Plan peaks in advance and compare with the same period last year |
+| Unsupported models | Normal CPI followed by a first-day retention collapse | Add brand negatives and show the supported list in the CPP |
 
 ---
 
-## 11. Юридические риски
+## 11. Legal risks
 
-⚠️ **Требует консультации с юристами до запуска — это не маркетинговое решение.**
+⚠️ **Get legal review before launch; this is not a marketing-only decision.**
 
-Вертикаль построена на чужих товарных знаках: `samsung`, `lg`, `roku`, `sony`, `vizio` — бренды производителей. Ставки на такие запросы в Apple Search Ads технически возможны и широко практикуются, но риск лежит не в отклонении кампании, а в двух других местах:
+The vertical depends on third-party trademarks such as `samsung`, `lg`, `roku`, `sony`, and
+`vizio`. Bidding on those queries in Apple Search Ads is technically possible and widely practiced,
+but the material risks lie elsewhere:
 
-- **Претензия правообладателя.** У Apple есть процедура рассмотрения жалоб на нарушение прав на товарные знаки; последствия затрагивают листинг приложения, а не только рекламу.
-- **Метаданные и креативы.** Использование чужих марок в названии, подзаголовке или тексте CPP — существенно более рискованно, чем ставка на ключевое слово, и может привести к отклонению на ревью.
+- **A rights-holder complaint.** Apple has a process for trademark complaints, and the consequences
+  can affect the app listing rather than only the ad campaign.
+- **Metadata and creatives.** Using another company's marks in the app name, subtitle, or CPP copy is
+  materially riskier than bidding on a keyword and can cause review rejection.
 
-Общая практика в вертикали — формулировки совместимости («работает с телевизорами …»), а не присвоение бренда. Но границу здесь определяет юрист и юрисдикция, а не этот плейбук.
+A common pattern is compatibility wording such as "works with ... TVs" rather than implying brand
+ownership. Legal counsel and the applicable jurisdiction determine the boundary, not this playbook.
 
 ---
 
-## 12. Что мерить в Adapty
+## 12. What to measure in Adapty
 
-Метрик Apple здесь принципиально недостаточно: `avg_cpt` и `total_avg_cpi` не отличают пользователя, который продлил недельную подписку четыре раза, от пользователя, который отменил на второй день, — а в вертикали с недельными подписками это и есть вся разница между прибылью и убытком.
+Apple metrics alone are insufficient. `avg_cpt` and `total_avg_cpi` cannot distinguish a user who
+renews a weekly subscription four times from one who cancels on day two. In a weekly-subscription
+utility, that difference determines profit.
 
-- `metrics --entity keyword --order-by gross_roas --by-days 7,30` — окупаемость на уровне ключа, а не кампании. Ради этого разреза вся структура §4 и строилась.
-- `trials_started` и `trials_converted` по ad group — где ломается воронка: в установке или в оплате.
-- `total_new_downloads` против `total_redownloads` — реальное приобретение против возвращения старых пользователей.
-- `metrics overview` с группировкой по неделям — сезонность и эффект пиков.
+- `metrics --entity keyword --order-by gross_roas --by-days 7,30` — profitability at keyword level,
+  not only campaign level. The §4 structure exists to make this cut useful.
+- `trials_started` and `trials_converted` by ad group — identify whether the funnel breaks before
+  installation or before payment.
+- `total_new_downloads` versus `total_redownloads` — true acquisition versus returning users.
+- `metrics overview` grouped by week — seasonality and peak effects.
 
-> Дисциплина запросов: метрики — 5 вызовов в минуту, не больше 2 за 10 секунд.
-> Разбор недели укладывается в 3–4 вызова. Подробности — в `references/request-budget.md`.
+> Query discipline: metrics allow five calls per minute and no more than two per ten seconds.
+> A weekly review should fit into three or four calls. See the metrics reference for details.
