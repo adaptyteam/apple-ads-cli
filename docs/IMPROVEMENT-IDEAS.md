@@ -388,4 +388,3 @@ Do not add these until a concrete product need changes the decision:
 6. Complete automation rules.
 7. Plan and implement the Adapty CLI changes: negative rollback, universal dry-run, account
    snapshot, dedicated Market Intelligence keywords, and change history.
-

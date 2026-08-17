@@ -9,4 +9,3 @@ and output contract.
 | Is the live structure correct; where do targets overlap; which exact owner or cross-negative is missing | `playbooks/structure-audit.md` |
 
 Do not use this skill for a weekly operating review, a future account design, or a mutation.
-

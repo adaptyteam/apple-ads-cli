@@ -9,4 +9,3 @@ or Apple-versus-Adapty installs question to `references/playbooks/account-health
 structure, duplicate Exact ownership, or missing cross-negatives to
 `references/playbooks/structure-audit.md`. Read one primary playbook, return evidence and
 confidence, and stop before every mutation.
-

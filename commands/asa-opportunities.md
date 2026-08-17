@@ -9,4 +9,3 @@ five competitor App Store ids, the country, and my app's intent. Use the full JS
 `asa competitors summary`, compare per-app country terms with active, paused, and negative keyword
 inventory, and never claim competitor bids or profitability. Analyze first; add selected keywords
 only after a separate proposal and explicit confirmation.
-
