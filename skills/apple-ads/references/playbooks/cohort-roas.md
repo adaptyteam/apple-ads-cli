@@ -19,15 +19,18 @@ so it is worth doing precisely.
 There is **no `ltv` metric.** Lifetime value is a cohort metric read at a renewal window, and
 `--by-days` is how you ask for it. Cohort roots — `revenue`, `arpu`, `arppu`, `arpas`, `roas`, `roi`
 — expand into `gross_`, `proceeds_` and `net_` variants. Ranking takes the **expanded** name:
-`--order-by gross_roas`, never `--order-by roas`.
+`--order-by net_roas`, never `--order-by roas`.
 
-Pick the variant deliberately and say which one you used:
+The CLI exposes all three variants, but agent workflows always use and offer `net_`:
 
 | Variant | What it is | Use when |
 |---|---|---|
-| `gross_` | before Apple's cut | comparing against Apple-side spend metrics |
-| `proceeds_` | after Apple's commission | judging real margin |
-| `net_` | after refunds and adjustments | closing the books |
+| `gross_` | before Apple's cut | CLI-only alternative; do not offer in an agent workflow |
+| `proceeds_` | after Apple's commission | CLI-only alternative; do not offer in an agent workflow |
+| `net_` | after refunds and adjustments | required agent-workflow variant |
+
+Do not ask the user to choose a revenue variant. Gross and proceeds remain documented only so the
+agent can understand raw CLI output without mistaking those fields for the workflow metric.
 
 ## The one call
 
@@ -35,7 +38,7 @@ Pick the variant deliberately and say which one you used:
 adapty asa metrics --entity keyword \
   --date-from <start> --date-to <end> \
   --metric roas --by-days 7 --by-days 30 --by-days 90 \
-  --order-by gross_roas --order-by-day 30 \
+  --order-by net_roas --order-by-day 30 \
   --page-size 100
 ```
 
@@ -61,7 +64,7 @@ this playbook. Every cohort looks bad before its first renewal.
 
 ## Turning it into a decision
 
-1. State the window and the variant you used, before the numbers.
+1. State the window and that net values are used, before the numbers.
 2. Compare against the **allowed** CPI derived from the app's own economics, not against a feeling.
 3. Split into three buckets: pays back, does not pay back, not enough data. The third is a real
    bucket — do not force rows into the first two.
@@ -73,4 +76,4 @@ this playbook. Every cohort looks bad before its first renewal.
 - Never compare cohort windows of different lengths against each other.
 - Never rank by a root name — the call succeeds and ranks by something you did not mean.
 - Never call a keyword unprofitable on a sample too small to carry the claim. Say the sample is thin.
-- Never mix `gross_` in one sentence and `proceeds_` in the next.
+- Never offer or select `gross_` or `proceeds_`; agent decisions use `net_` consistently.

@@ -11,6 +11,8 @@ jobs:
         run: node scripts/lint-playbooks.mjs
       - name: Flagship workflow behavior contracts
         run: node scripts/lint-workflows.mjs
+      - name: Quiet Cowork preflight fixtures
+        run: node scripts/test-cowork-preflight.mjs
       - name: Translations are not stale
         run: node scripts/lint-i18n.mjs
       - name: Plugin manifests are valid JSON

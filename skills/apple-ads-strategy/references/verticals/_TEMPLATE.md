@@ -14,12 +14,12 @@ updated: YYYY-MM-DD
 <!--
 HOW TO USE THIS TEMPLATE
 
-Every section below is mandatory. A section you cannot fill is a section you mark
-`> TODO(owner): <what is missing>` — never one you delete. Missing sections are
-what make a guide library feel unreliable.
+Every section below is mandatory. Do not ship the guide while a section is incomplete. If a
+number cannot be sourced, state the first-party measurement required and keep the value explicitly
+unknown instead of inserting a placeholder or inventing a benchmark.
 
 Every number is either (a) sourced and linked, (b) marked as a range to calibrate,
-or (c) marked TODO. Never write a confident number you cannot source: a made-up
+or (c) explicitly unknown with a measurement plan. Never write a confident number you cannot source: a made-up
 CPT benchmark is worse than no benchmark, because the agent will act on it.
 
 Slots to fill are marked `[fill in]`.
@@ -142,9 +142,9 @@ Provide ordered steps that link to procedural playbooks. Commands belong in thos
 this guide; that is the only way to avoid duplicating CLI syntax across many vertical guides.
 
 1. Verify the connection and access → `playbooks/preflight.md`
-2. Create the campaign structure → `playbooks/campaign-launch.md`
-3. Load starting keywords and negatives → `playbooks/keyword-load.md`
-4. Configure automation rules → `playbooks/automation-rules.md`
+2. Create the campaign structure → `apple-ads` skill, workflow 3
+3. Load starting keywords and negatives → `apple-ads` skill, workflow 3
+4. Configure automation rules → `apple-ads` skill, workflow 9
 5. Run the first review after seven days → `playbooks/weekly-review.md`
 
 ---
@@ -186,7 +186,7 @@ standard Apple metrics are insufficient.]
 
 <!-- Pre-merge checklist:
 [ ] Frontmatter is complete; uses is empty or every command exists in the CLI reference
-[ ] Every number has a source, a calibration range, or a TODO
+[ ] Every number has a source, a calibration range, or an explicit measurement plan
 [ ] Section 0 defines when the playbook does not apply
 [ ] Launch steps link to playbooks instead of duplicating commands
 [ ] The updated date is set

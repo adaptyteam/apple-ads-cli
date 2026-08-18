@@ -1,6 +1,5 @@
-<!-- GENERATED — synced from adaptyteam/adapty-cli @ v0.4.0. Do not edit here.
-     Source of truth: adapty-cli/docs/agent/. Edits made in this file are overwritten
-     by .github/workflows/sync-from-cli.yml on the next CLI release. -->
+<!-- GENERATED — synced from adaptyteam/adapty-cli@main (docs/agent/asa-management.md). Do not edit here.
+     Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Apple Search Ads — Managing Campaigns
 
@@ -19,12 +18,12 @@ Every `list` and `get` command in this file returns metadata only, no metrics. E
 
 ## Account and discovery
 
-| Command | Notes |
-|---|---|
-| `asa whoami` | Company, how access was granted, Apple connection state. Run this first. No connected Apple Ads account or no active Ads Manager subscription answers `402 ads_manager_subscription_required` on every other `asa` command. |
-| `asa connect [--no-wait]` | Prints the Apple authorization link and waits for the link to be completed; `--no-wait` returns immediately instead of waiting. |
-| `asa apps list` | Apps promoted in Apple Search Ads; pagination only. Its rows supply `--adam-id` for `campaigns create`. |
-| `asa orgs list` | Apple Search Ads organizations; pagination only. Each row carries two identifiers, not interchangeable: `internal_id` (a UUID) and `org_id` (Apple's numeric id). `--org` on `campaigns create` takes `internal_id` — passing the numeric `org_id` fails with "Invalid org ID format." |
+| Command | Flags | Notes |
+|---|---|---|
+| `asa whoami` | none | Company, how access was granted, Apple connection state. Run this first. No connected Apple Ads account or no active Ads Manager subscription answers `402 ads_manager_subscription_required` on every other `asa` command. |
+| `asa connect` | `--no-wait` optional | Prints the Apple authorization link and waits for the link to be completed; `--no-wait` returns immediately instead of waiting. |
+| `asa apps list` | pagination only | Apps promoted in Apple Search Ads. Its rows supply `--adam-id` for `campaigns create`. |
+| `asa orgs list` | pagination only | Apple Search Ads organizations. Each row carries two identifiers, not interchangeable: `internal_id` (a UUID) and `org_id` (Apple's numeric id). `--org` on `campaigns create` takes `internal_id` — passing the numeric `org_id` fails with "Invalid org ID format." |
 
 ## Campaigns
 
@@ -34,6 +33,8 @@ Every `list` and `get` command in this file returns metadata only, no metrics. E
 | `asa campaigns get <id>` | positional UUID | Metadata only. |
 | `asa campaigns create` | `--org`, `--name`, `--adam-id`, `--country` (repeatable), `--daily-budget`; optional `--status` (`ENABLED`/`PAUSED`, no default), `--budget` (lifetime), `--target-cpa`, `--bidding-strategy`, `--supply-source` (repeatable, default `APPSTORE_SEARCH_RESULTS`), `--billing-event` (`IMPRESSIONS`/`TAPS`, default `TAPS`), `--ad-channel-type` (`DISPLAY`/`SEARCH`, default `SEARCH`) | `--org` takes the UUID (`internal_id`) from `asa orgs list`, not that row's numeric `org_id`; `--adam-id` comes from `asa apps list`. `--status` has no default — pass `--status PAUSED` to launch without spending until you enable it. |
 | `asa campaigns update <id>` | at least one of `--name`, `--status`, `--country`, `--daily-budget`, `--budget`, `--target-cpa`, `--bidding-strategy` | |
+| `asa campaigns bulk-create` | exactly one of `--file` (JSON structure, `-` for stdin) / `--from-file` (Apple Ads template, `.xlsx` or keywords `.csv`); `--org-id` required with `--from-file`; optional `--preview`, `--no-wait`, `--poll-interval` (default `5`), `--timeout` (default `900`) | Creates a whole structure — campaigns → ad groups → keywords/negative keywords/ads — as one queued operation. `--org-id` is the exception to this file's UUID rule: it takes the **numeric** `org_id` from `asa orgs list` (Apple's `campaign_group_id`), not the `internal_id` UUID that `campaigns create --org` takes. `--from-file` converts the template server-side first (its own budget — see [Request budgets](#request-budgets)); with `--preview` the command prints the converted request and creates nothing. By default it polls until the operation finishes (`success`/`partial`/`failed`, per-object failures listed); `--no-wait` prints the `operation_id` and returns — follow up with `bulk-status`. |
+| `asa campaigns bulk-status <operation-id>` | positional operation id, printed by `bulk-create` | Progress of one bulk operation: status, applied/failed counts, and the per-object log with each failure's reason. |
 
 ## Ad groups
 
@@ -48,7 +49,7 @@ Every `list` and `get` command in this file returns metadata only, no metrics. E
 
 | Command | Flags | Notes |
 |---|---|---|
-| `asa ads list` | scope filters only, **no `--app`** | Ads hang off ad groups, not apps directly — filter by `--ad-group` or `--campaign` instead. Metadata only. |
+| `asa ads list` | scope filters only | Ads hang off ad groups, not apps directly — there is no `--app`; filter by `--ad-group` or `--campaign` instead. Metadata only. |
 | `asa ads get <id>` | positional UUID | `serving_state_reasons` in the response explains a non-running ad. |
 | `asa ads create` | `--ad-group`, `--creative-id`, `--name` | The creative id comes from `asa creatives list`. |
 | `asa ads update <id>` | `--name` and/or `--status` | The creative and the parent ad group are fixed at creation and cannot be changed. |
@@ -139,6 +140,7 @@ Every `asa` command is rate limited per company, not per token:
 | catalog lists and gets, automation reads | 120/min |
 | `keywords list` | 30/min, burst 5 per 10s, its own 2-concurrent pool, 60s server timeout |
 | all writes | 20/min |
+| template conversion (`bulk-create --from-file`) | 10/min, one conversion at a time |
 | `whoami` | 60/min |
 
 `keywords list` is the heaviest metadata read in the surface — its own budget is on top of

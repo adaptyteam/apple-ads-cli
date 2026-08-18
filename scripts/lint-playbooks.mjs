@@ -16,9 +16,7 @@ import { join, relative, basename, extname } from 'node:path'
 
 const ROOT = new URL('..', import.meta.url).pathname
 const errors = []
-const warnings = []
 const fail = (file, msg) => errors.push(`${relative(ROOT, file)}: ${msg}`)
-const warn = (file, msg) => warnings.push(`${relative(ROOT, file)}: ${msg}`)
 
 // Fields the Agent Skills spec accepts outside Claude Code. Anything else fails validation
 // when a skill is packaged for claude.ai or the Skills API.
@@ -114,8 +112,10 @@ for (const { dir, kind: expectedKind, index } of targets) {
       fail(path, `not listed in ${relative(ROOT, index)} — an unreachable playbook is a dead playbook`)
     }
 
-    if (/^>\s*\*\*Stub\.\*\*/m.test(text)) warn(path, 'stub — contract only, body not written')
-    if (text.includes('TODO(owner)')) warn(path, 'has unfilled TODO(owner) slots')
+    if (/^>\s*\*\*Stub\.\*\*/m.test(text)) fail(path, 'stub content is not shippable; remove the route or finish the file')
+    if (f !== '_TEMPLATE.md' && text.includes('TODO(owner)')) {
+      fail(path, 'has unfilled TODO(owner) slots')
+    }
   }
 
   // Every INDEX row must resolve to a file that exists.
@@ -175,7 +175,6 @@ for (const file of publicTextFiles) {
 }
 
 // ---- report ---------------------------------------------------------------------------
-for (const w of warnings) console.log(`warn  ${w}`)
 for (const e of errors) console.error(`ERROR ${e}`)
-console.log(`\n${errors.length} error(s), ${warnings.length} warning(s)`)
+console.log(`\n${errors.length} error(s)`)
 process.exit(errors.length ? 1 : 0)

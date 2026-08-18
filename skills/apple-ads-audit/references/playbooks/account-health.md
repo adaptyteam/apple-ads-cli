@@ -33,7 +33,8 @@ Resolve or ask for:
 
 - company and app;
 - exact date window;
-- the business success metric and cohort window, if the user wants value judgments;
+- the business success metric, and a cohort window only when that metric is `revenue`, `roas`,
+  `arpu`, `arppu`, `arpas`, or `roi`, if the user wants value judgments;
 - any user-defined spend, CPA, or ROAS limits;
 - optional campaign scope.
 
@@ -49,7 +50,7 @@ bad, profitable, or unprofitable.
 4. Read one account overview for spend, Apple installs, Adapty installs, the requested cost metric,
    and the requested cohort root. The time series supplies the trend; do not call once per period.
 5. Read one ranked campaign result only when the user asks which campaigns need attention. Use the
-   user's metric, direction, and cohort window.
+   user's metric and direction, adding a cohort window only for a cohort root.
 6. Drill into one suspicious level only when the broad evidence cannot answer the question.
 7. Read `ads get` only for an ad whose serving state requires an explanation.
 8. Read keyword, negative, product-page, or creative inventory only when the corresponding control
@@ -75,7 +76,8 @@ drill-down question. Metadata reads do not justify unscoped lists.
 
 ### Performance
 
-- State the metric, date window, cohort window, and revenue variant before interpreting it.
+- State the metric and date window before interpreting it. State a cohort window only for a cohort
+  root, and always use net rather than asking the user to choose a revenue variant.
 - Keep immature cohorts in `unknown` or `insufficient evidence`.
 - Compare against the user's target or the account's own requested historical period. Do not invent
   a universal threshold.

@@ -60,69 +60,6 @@ Acceptance criteria:
 - Dependent writes stop when a prerequisite fails.
 - Tests fail when a safety boundary is removed from a workflow.
 
-## P0 — complete the existing operator chain
-
-Four current operator playbooks remain stubs. Complete them in this order.
-
-### 1. Keyword load
-
-This closes the path from Market Intelligence or strategy output to a verified live keyword list:
-
-```text
-keyword opportunities
-→ approved list
-→ safe keyword load
-→ read-back verification
-→ separate bid review
-```
-
-Required behavior:
-
-- resolve destination ownership before loading;
-- compare active, paused, and negative inventory;
-- require explicit match type and bid;
-- keep additions at 15 keywords or fewer per call;
-- use a fresh idempotency key per batch;
-- report applied, skipped, duplicate, rejected, and unverifiable rows;
-- never combine loading and later bid optimization under one confirmation.
-
-### 2. Budget reallocation
-
-This closes the main execution path from a weekly check-in.
-
-Required behavior:
-
-- use a user-approved value metric and cohort window;
-- protect campaign minimums and account budget totals;
-- separate budget and bid decisions;
-- show before and after budgets for every campaign;
-- require confirmation for the complete allocation plan;
-- read every changed campaign back.
-
-### 3. Campaign launch
-
-Required behavior:
-
-- consume a completed strategy plan;
-- resolve organization and app ids from reads;
-- create the full hierarchy in dependency order;
-- create campaigns paused;
-- use pinned, distinct idempotency keys for every write;
-- verify each parent before creating a child;
-- stop the chain after an ambiguous or failed prerequisite;
-- enable only through a second explicit confirmation.
-
-### 4. Automation rules
-
-Required behavior:
-
-- validate the rule schema before creation;
-- dry-run every rule that can change bids or budgets;
-- show affected entities and proposed changes;
-- start a rule only after the user reviews the dry-run;
-- preserve run history and explain partial failures;
-- never use an automation to bypass workflow confirmation rules.
-
 ## P1 — standardize mutation plans
 
 ### Introduce one Action Plan contract
@@ -354,17 +291,6 @@ Remove it only in a breaking release after:
 - all internal routing points directly to `keyword-opportunity.md`;
 - documentation and examples no longer link to the old path;
 - routing evaluations pass without the redirect.
-
-## P3 — expand strategy coverage
-
-After the operator chain is complete, finish the existing strategy vertical stubs:
-
-- utility cleaner;
-- utility scanner;
-- VPN.
-
-Execution playbooks come first. A detailed strategy is less useful when campaign launch and keyword
-load remain incomplete.
 
 ## Deliberate non-goals
 

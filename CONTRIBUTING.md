@@ -5,10 +5,11 @@ The most useful contribution is a **vertical guide** for a category that has non
 ## Adding a vertical guide
 
 1. Copy `skills/apple-ads-strategy/references/verticals/_TEMPLATE.md`.
-2. Fill **every** section. A section you cannot fill gets `> TODO(owner): ...`, never a deletion —
-   missing sections are what make a guide library feel unreliable.
-3. Every number is sourced, given as a range to calibrate, or marked TODO. A fabricated CPI
-   benchmark is worse than none, because the agent will act on it.
+2. Fill **every** section. Do not add the guide until no template slots, checklists, stubs, or
+   `TODO(owner)` markers remain.
+3. Every number is sourced or given as a range to calibrate. When evidence is unavailable, state
+   which first-party input must be measured and keep its value explicitly unknown. A fabricated
+   CPI benchmark is worse than none, because the agent will act on it.
 4. Add a row to `skills/apple-ads-strategy/references/INDEX.md`. A guide with no INDEX row is never
    opened.
 5. `node scripts/lint-playbooks.mjs` and `node scripts/lint-workflows.mjs` must pass.
