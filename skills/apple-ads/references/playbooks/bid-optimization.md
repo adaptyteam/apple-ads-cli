@@ -23,17 +23,24 @@ no changes; forcing a thin row into a decision is a failure.
 
 - The user has not selected a performance goal and only wants a report → return outliers without a
   mutation proposal.
-- The question is campaign budget allocation → `budget-reallocation.md`.
+- The question is campaign budget allocation → keep it as a separate decision; this playbook does
+  not implement budget changes.
 - The cohort is too young for the selected subscription model → `cohort-roas.md`, then wait.
 
 ## Required inputs
 
 - app and ad-group or campaign scope;
 - exact date window;
-- subscription period and selected cohort window;
-- revenue variant: gross, proceeds, or net;
-- target ROAS, target CPA, allowable CPI, or another explicit decision rule;
+- success metric and target; when offering metrics, use this exact priority: `cost_per_paid`,
+  `cost_per_trial`, then net `roas` at day X;
+- subscription period and selected cohort window only for `revenue`, `roas`, `arpu`, `arppu`,
+  `arpas`, or `roi`;
 - optional bid floor, ceiling, and aggressiveness policy.
+
+Always use the `net_` variant for revenue-family metrics and do not ask the user to choose a
+variant. Never ask for a cohort window or use `--by-days` / `--order-by-day` for `cost_per_paid`,
+`cost_per_trial`, or any other non-cohort metric; those values apply directly to the report's date
+window.
 
 Do not invent a target, cutoff, bid, or fixed percentage adjustment. If the user has no bid-change
 policy, identify the bucket first and ask for the exact proposed amount before writing.
@@ -43,8 +50,8 @@ policy, identify the bucket first and ask for the exact proposed amount before w
 1. Read scoped active and paused keyword metadata to obtain ids, current bids, status, text, and
    match type.
 2. Make one keyword metrics request for spend, Apple and Adapty installs, the selected cost/value
-   metrics, rank, search popularity, and impression midpoint. Include the approved `--by-days`
-   window and rank by the expanded cohort metric when applicable.
+   metrics, rank, search popularity, and impression midpoint. Only for a cohort root, include the
+   approved `--by-days` window and rank by the expanded `net_` metric.
 3. Match metrics rows to the scoped ids. `metrics` has no scope filters; an account-wide row is not
    permission to act outside the requested scope.
 4. Record coverage. If the full scoped set does not fit in the returned page, do not claim a complete
@@ -54,7 +61,7 @@ policy, identify the bucket first and ask for the exact proposed amount before w
 
 Evaluate maturity before performance:
 
-- The selected cohort window must fit the subscription renewal cycle.
+- For a cohort root, the selected cohort window must fit the subscription renewal cycle.
 - A row with too little sample to support the user's rule is `insufficient_data`.
 - A zero or missing value after an immature window is not a pause signal.
 - State why the sample is sufficient or insufficient; do not invent a universal install count.
@@ -78,7 +85,7 @@ Show one row per keyword:
 
 - keyword text and id;
 - current bid and status;
-- selected metrics and cohort window;
+- selected metrics and cohort window when applicable;
 - category;
 - proposed bid or status, when supplied by the approved policy;
 - evidence and confidence;
@@ -101,12 +108,13 @@ Do not combine a budget change with this confirmation.
 ## Output
 
 Return the five categories separately, then the mutation proposal, unknowns, and verification
-result. State the target, variant, cohort window, and sample limitation above the table.
+result. State the target and sample limitation above the table. For a cohort root, also state the
+cohort window and net variant; do not invent either field for a non-cohort metric.
 
 ## Example
 
 ```text
-increase — KW-31, "scanner app": day-30 proceeds ROAS 1.34 against the user's 1.20 target; rank and
+increase — KW-31, "scanner app": day-30 net ROAS 1.34 against the user's 1.20 target; rank and
 impression midpoint indicate room for reach. Current bid: $1.10. Proposed bid: unknown until the
 user supplies an amount or aggressiveness policy. Confidence: medium; economics are mature, future
 volume is not guaranteed.
@@ -124,5 +132,4 @@ volume is not guaranteed.
 ## Related playbooks
 
 - Choose the cohort window → `cohort-roas.md`.
-- Reallocate campaign budgets → `budget-reallocation.md`.
 - Add newly harvested keywords → `search-term-harvesting.md`.

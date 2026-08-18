@@ -5,12 +5,16 @@
 // generated upstream, next to the commands, where CI can check them against the real
 // oclif manifest. This script copies the result here and stamps the version it came from.
 //
-// Usage: node scripts/sync-agent-docs.mjs [--ref v0.4.0]
-import { writeFileSync, mkdirSync } from 'node:fs'
-import { dirname } from 'node:path'
+// Usage: node scripts/sync-agent-docs.mjs [--ref=v0.4.0]
+//        node scripts/sync-agent-docs.mjs --source-dir=../adapty-cli [--only=<upstream path>]
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 
 const ROOT = new URL('..', import.meta.url).pathname
 const ref = (process.argv.find((a) => a.startsWith('--ref='))?.split('=')[1]) ?? 'main'
+const sourceDirArg = process.argv.find((a) => a.startsWith('--source-dir='))
+const sourceDir = sourceDirArg ? resolve(sourceDirArg.slice('--source-dir='.length)) : null
+const only = process.argv.find((a) => a.startsWith('--only='))?.slice('--only='.length) ?? null
 const REPO = 'adaptyteam/adapty-cli'
 
 // upstream path -> path in this repo
@@ -26,15 +30,28 @@ const header = (src) =>
 
 let failed = 0
 for (const [src, dest] of Object.entries(FILES)) {
-  const url = `https://raw.githubusercontent.com/${REPO}/${ref}/${src}`
-  const res = await fetch(url)
-  if (!res.ok) {
-    console.error(`ERROR ${src}: ${res.status} ${res.statusText}`)
-    console.error(`      upstream has not published this file yet — leaving the local copy alone.`)
-    failed++
-    continue
+  if (only && src !== only) continue
+
+  let body
+  if (sourceDir) {
+    try {
+      body = readFileSync(join(sourceDir, src), 'utf8')
+    } catch (error) {
+      console.error(`ERROR ${src}: ${error instanceof Error ? error.message : 'local read failed'}`)
+      failed++
+      continue
+    }
+  } else {
+    const url = `https://raw.githubusercontent.com/${REPO}/${ref}/${src}`
+    const res = await fetch(url)
+    if (!res.ok) {
+      console.error(`ERROR ${src}: ${res.status} ${res.statusText}`)
+      console.error(`      upstream has not published this file yet — leaving the local copy alone.`)
+      failed++
+      continue
+    }
+    body = await res.text()
   }
-  let body = await res.text()
   // a synced SKILL.md keeps its frontmatter first; the header goes after it
   if (body.startsWith('---\n')) {
     const end = body.indexOf('\n---', 3) + 4

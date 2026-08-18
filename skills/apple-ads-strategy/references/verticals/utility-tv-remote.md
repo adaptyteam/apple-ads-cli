@@ -62,9 +62,9 @@ the first few weeks, so scaling decisions use a short horizon.
 
 | Input | Source | Value |
 |---|---|---|
-| Day-7 and day-30 ARPU | Adapty cohorts, `--by-days 7,30` | > TODO(owner): fill from Utilities benchmarks |
-| Install → trial | First-party analytics | > TODO(owner) |
-| Trial → paid | Category benchmarks | > TODO(owner): link to `subscription-benchmarks`, Utilities, weekly subscriptions |
+| Day-7 and day-30 net ARPU | Adapty cohorts, `--by-days 7,30` | Read from the app's own cohorts; unknown before data exists |
+| Install → trial | First-party analytics | Read from the app's own funnel for the same acquisition window |
+| Trial → paid | First-party analytics or Utilities benchmarks | Prefer the app's own mature cohort; otherwise keep the input unknown |
 | Redownload share | `total_redownloads / total_installs` | Calculate from first-party day-7 data |
 | Allowable CPT | Derived from the rows above | Calculate it; never guess |
 
@@ -119,11 +119,11 @@ every useful query into an exact-match campaign. Without this rule, the multiple
 
 | Bucket | Starting bid | Ceiling | Review cadence |
 |---|---|---|---|
-| Own brand | > TODO(owner) | Low | Monthly |
-| Hardware brand | > TODO(owner) | Up to allowable CPT | Every 3–4 days during the first two weeks |
-| Generic | > TODO(owner) | Hard ceiling below hardware-brand bids | Weekly |
-| Function | > TODO(owner) | Medium | Weekly |
-| Competitors | > TODO(owner) | Based on measured profitability | Weekly |
+| Own brand | Lowest bid that preserves delivery | Below every non-brand ceiling | Monthly |
+| Hardware brand | Start below the derived allowable CPT | Allowable CPT | Every 3–4 days during the first two weeks |
+| Generic | Discount from the hardware-brand starting bid | Below the hardware-brand ceiling | Weekly |
+| Function | Start between own-brand and hardware-brand bids | Allowable CPT | Weekly |
+| Competitors | Conservative test bid | Ceiling derived from measured net value | Weekly |
 | Discovery | Minimum | Minimum | Never scale |
 
 The minimum daily budget must let each ad group collect a statistically meaningful number of installs
@@ -172,10 +172,10 @@ supported one and is worth zero.
 Execution commands live in the procedural playbooks; this section defines only the order.
 
 1. Verify the connection and permissions → `playbooks/preflight.md`
-2. Create the campaigns and ad groups from §4 → `playbooks/campaign-launch.md`
-3. Load the keywords from §3 and negatives from §7 → `playbooks/keyword-load.md`
+2. Create the campaigns and ad groups from §4 → `apple-ads` skill, workflow 3
+3. Load the keywords from §3 and negatives from §7 → `apple-ads` skill, workflow 3
 4. Attach CPPs to hardware-brand ad groups → `playbooks/creative-setup.md`
-5. Configure overspend and zero-conversion stop rules → `playbooks/automation-rules.md`
+5. Configure overspend and zero-conversion stop rules → `apple-ads` skill, workflow 9
 6. Day 3: harvest Discovery search terms → `playbooks/search-term-harvesting.md`
 7. Day 7: run the first cohort review → `playbooks/cohort-roas.md`
 
@@ -186,8 +186,8 @@ Execution commands live in the procedural playbooks; this section defines only t
 | Horizon | Measure | Continue | Cut or fix |
 |---|---|---|---|
 | Day 3 | Share of irrelevant Discovery search terms | Falls after harvesting | Remains high: fix negatives, not bids |
-| Day 7 | `tap_install_cpi` for hardware-brand ad groups versus allowable CPT; `trials_started` | CPI remains inside the hypothesis | > TODO(owner): define threshold |
-| Day 30 | Cohort ROAS (`gross_roas`, `--by-days 30`) by bucket | At or above target | Below target: do not scale the bucket; more time is unlikely to fix it |
+| Day 7 | `tap_install_cpi` for hardware-brand ad groups versus allowable CPT; `trials_started` | CPI remains inside the hypothesis | CPI exceeds the user's allowable CPT with enough volume to support the comparison |
+| Day 30 | Cohort ROAS (`net_roas`, `--by-days 30`) by bucket | At or above target | Below target: do not scale the bucket; more time is unlikely to fix it |
 | Day 90 | Cohort stability and renewal share | Confirms the day-30 conclusion | Diverges: investigate retention rather than acquisition |
 
 ---
@@ -230,7 +230,7 @@ Apple metrics alone are insufficient. `avg_cpt` and `total_avg_cpi` cannot disti
 renews a weekly subscription four times from one who cancels on day two. In a weekly-subscription
 utility, that difference determines profit.
 
-- `metrics --entity keyword --order-by gross_roas --by-days 7,30` — profitability at keyword level,
+- `metrics --entity keyword --order-by net_roas --by-days 7,30` — profitability at keyword level,
   not only campaign level. The §4 structure exists to make this cut useful.
 - `trials_started` and `trials_converted` by ad group — identify whether the funnel breaks before
   installation or before payment.

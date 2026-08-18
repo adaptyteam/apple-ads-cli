@@ -66,7 +66,8 @@ new task. The operator must re-resolve ids and obtain its own confirmation.
 2. **Plan the reads.** Use list counts for entity counts and server aggregation for metrics. Keep
    the standard audit inside the analytics budget; never loop per entity or per day.
 3. **Normalize evidence.** Give each returned row or metadata fact an evidence id. Keep the source,
-   window, entity id, metric, and cohort window attached to it.
+   window, entity id, and metric attached to it; include a cohort window only for `revenue`, `roas`,
+   `arpu`, `arppu`, `arpas`, or `roi`.
 4. **Separate layers.** Write the observation first, then the explanation, then the recommendation.
    Never present an explanation as observed fact.
 5. **Apply applicability.** Mark controls that cannot be evaluated as `unknown` or
@@ -79,7 +80,7 @@ Every audit response contains:
 
 1. `summary` — a short plain-language answer.
 2. `scope` — company, app, entity scope, and identifiers used.
-3. `date_window` — exact dates, grouping, and cohort window when relevant.
+3. `date_window` — exact dates and grouping, plus a cohort window only for a cohort root.
 4. `findings` — ordered by severity.
 5. `evidence` — ids that map every claim to returned data.
 6. `confidence` — overall confidence and the limiting missing data.

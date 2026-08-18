@@ -150,7 +150,8 @@ the app's stated cleanup intent. This does not reveal either competitor's bid or
 
 ## Related playbooks
 
-- Add a chosen list directly → `keyword-load.md`.
+- Add a chosen list directly → use workflow 3 in `SKILL.md` and the keyword-write contract in
+  `../asa-management.md`.
 - Choose or change its bid → `bid-optimization.md`.
 - Route a theme to a page → `creative-setup.md`.
 - Design initial taxonomy without competitor ids → `../../../apple-ads-strategy/references/keyword-taxonomy.md`.

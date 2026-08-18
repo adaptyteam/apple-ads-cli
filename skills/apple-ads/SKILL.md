@@ -18,15 +18,81 @@ Open the reference a workflow names before running its commands:
 
 ## Preflight — always, every session
 
-**First action of every session is `adapty asa whoami`.** Not a check you skip because setup "was
-already done": a cloud or Cowork session starts on a clean machine and nothing carries over.
+**First action of every session is the quiet `adapty asa whoami` wrapper below.** Not a check you
+skip because setup "was already done": a cloud or Cowork session starts on a clean machine and
+nothing carries over. Run the block as one command and do not narrate before it.
+
+```bash
+# agent-preflight:start
+if ! command -v adapty >/dev/null 2>&1; then
+  echo NEED_SETUP
+  exit 0
+fi
+
+clean_preflight() {
+  printf '%s\n' "$1" | sed '/^ERROR: failed to copy trust settings of system certificate-25291$/d'
+}
+
+OUT=$(adapty asa whoami 2>&1); RC=$?
+if printf '%s\n' "$OUT" | grep -q 'failed to copy trust settings of system certificate-25291'; then
+  OUT=$(NODE_USE_SYSTEM_CA=0 adapty asa whoami 2>&1); RC=$?
+  CLEAN=$(clean_preflight "$OUT")
+  if [ "$RC" -eq 0 ]; then
+    [ -n "$CLEAN" ] && printf '%s\n' "$CLEAN"
+    echo READY_AUTHED_SYSTEM_CA_OFF
+    exit 0
+  fi
+  case "$CLEAN" in
+    *ads_manager_subscription_required*|*402*)
+      [ -n "$CLEAN" ] && printf '%s\n' "$CLEAN"
+      echo READY_AUTHED_NO_SUB
+      exit 0
+      ;;
+  esac
+  echo RETRY_OUTSIDE_SANDBOX
+  exit 75
+fi
+
+CLEAN=$(clean_preflight "$OUT")
+if [ "$RC" -eq 0 ]; then
+  [ -n "$CLEAN" ] && printf '%s\n' "$CLEAN"
+  echo READY_AUTHED
+  exit 0
+fi
+case "$CLEAN" in
+  *ads_manager_subscription_required*|*402*)
+    [ -n "$CLEAN" ] && printf '%s\n' "$CLEAN"
+    echo READY_AUTHED_NO_SUB
+    ;;
+  *AuthRequiredError*|*'Not authenticated. Run `adapty auth login`.'*)
+    echo NEED_SETUP
+    ;;
+  *NetworkError*|*network_error*|*'Could not reach Adapty API'*|*'fetch failed'*)
+    echo NETWORK_BLOCKED
+    ;;
+  *)
+    [ -n "$CLEAN" ] && printf '%s\n' "$CLEAN"
+    echo PREFLIGHT_ERROR
+    ;;
+esac
+# agent-preflight:end
+```
 
 | What it does | What that means |
 |---|---|
-| Prints a company and `Apple Credentials Status: active` | Ready. Continue. |
-| `adapty: command not found`, or an auth error | Open the `adapty-cli-setup` skill and stop here. Do not hand-roll an install or a login. |
+| `READY_AUTHED` after a company with `Apple Credentials Status: active` | Ready. Continue and confirm success in one short line. |
+| `READY_AUTHED_SYSTEM_CA_OFF` | Ready. Prefix every later `adapty` call in this session with `NODE_USE_SYSTEM_CA=0`; do not mention the suppressed certificate noise. |
+| `RETRY_OUTSIDE_SANDBOX` | Retry the same read-only `adapty asa whoami` exactly once outside the sandbox if the tool explicitly supports it. On success, use that mode for later read-only `adapty` calls in this session. Never use `sudo`. |
+| `NEED_SETUP` | Open the `adapty-cli-setup` skill and stop here. Do not hand-roll an install or a login. |
 | `402 ads_manager_subscription_required` | Authenticated fine; the company has no Ads Manager subscription. Not a bug and no flag works around it. Say so plainly. Planning still works — offer `apple-ads-strategy`. |
 | Apple credentials not active | `adapty asa connect` — see `adapty-cli-setup`. |
+| `NETWORK_BLOCKED`, or the one outside-sandbox retry also fails | Do not open setup, reinstall, or authenticate. Say only: “Adapty API is unreachable from this sandbox. Allow network access for `adapty.io` and `*.adapty.io`, then start a new task.” |
+| `PREFLIGHT_ERROR` | Surface the cleaned error once and stop. Do not guess that it is an authentication problem. |
+
+`NetworkError` never routes to `adapty-cli-setup`. Do not install or log in. Certificate `-25291`
+is sandbox Keychain noise, not an Adapty certificate failure. Never recommend resetting Keychain,
+updating Xcode, using `sudo`, reinstalling the CLI, or running `auth login` for it. The raw repeated
+lines stay captured inside the wrapper and must not be copied into the response.
 
 ## Finding the right playbook
 
@@ -53,7 +119,9 @@ here. Do not make audit and operator compete for the same request.
 
 Every recurring workflow returns `summary`, `scope`, `date_window`, `findings`, `evidence`,
 `confidence`, `unknowns`, and `recommended_actions`. A finding separates the observed value from
-its explanation and names the metric, entity id, date window, and cohort window behind it.
+its explanation and names the metric, entity id, and date window behind it. Name a cohort window
+only for `revenue`, `roas`, `arpu`, `arppu`, `arpas`, or `roi`; non-cohort metrics have no day-X
+interpretation.
 
 A workflow that may write also shows a mutation proposal before asking for confirmation:
 
@@ -165,8 +233,8 @@ ask for — propose that in the answer instead.
   user when to retry.
 - **Never guess or probe a metric name.** The vocabulary is in `references/asa-metrics.md`. A wrong
   name fails listing every valid one, so a typo costs one call — spending a call to see what works
-  is the failure. Cohort metrics rank by their expanded names: `--order-by gross_roas`, not
-  `--order-by roas`.
+  is the failure. Cohort metrics rank by their expanded names; agent workflows always use
+  `--order-by net_roas`, not `--order-by roas`, and never offer gross or proceeds.
 - **Never invent an id, adam-id, budget or bid.** Read it from the matching list, or ask.
 - **Never put `--yes` on a command the user will run.** It deletes the preview they would have read.
   `--yes` belongs only on a command you run yourself, after an explicit yes.
@@ -192,6 +260,8 @@ ask for — propose that in the answer instead.
 - More than 15 keywords in one call
 - A write whose target you picked by your own definition of "best", "losing" or "terrible"
 - `--order-by-day` with no matching `--by-days` window in the same call
+- `--by-days`, `--order-by-day`, or a `day-X` label attached to `cost_per_paid`, `cost_per_trial`,
+  or any metric outside `revenue`, `roas`, `arpu`, `arppu`, `arpas`, and `roi`
 - You stated a rule, and three commands later are making a silent exception to it
 
 Observed in CLI-side sessions rather than in this skill's own baseline:
@@ -212,8 +282,10 @@ Prerequisite for everything below. → `references/asa-management.md`,
 **2. Report performance.** Totals and any trend take the first shape; best or worst N takes the
 second, with `--order asc` for worst. Dates are required on both — without them the command exits
 before it reaches Apple. Counting needs no metrics call: any list at `--page-size 1` carries
-`meta.pagination.count`. `--by-days` takes max **16 windows per call**, and `--order-by-day` may
-only name one of those values. → `references/asa-metrics.md`, `## Cohort windows`.
+`meta.pagination.count`. `--by-days` takes max **16 windows per call**, applies only to `revenue`,
+`roas`, `arpu`, `arppu`, `arpas`, and `roi`, and `--order-by-day` may only name one of those values.
+Revenue-family decisions always use the expanded `net_` value. → `references/asa-metrics.md`,
+`## Cohort windows`.
 
 ```
 adapty asa metrics overview --entity <level> --date-from <YYYY-MM-DD> --date-to <YYYY-MM-DD> [--period-unit <bucket>]
@@ -241,12 +313,13 @@ new Exact owner before adding a narrow cross-negative to the source. Keep promot
 already-owned, conflict, and insufficient-evidence rows separate. Maximum 15 additions per call,
 with a fresh key per call. → `references/playbooks/search-term-harvesting.md`.
 
-**5. Keyword bid review.** Choose the cohort window from the monetization model, read keyword
-metadata, then rank with one server-side metrics call using the user's success metric and target.
-Separate increase, keep, decrease, pause-candidate, and insufficient-data rows. Without a target,
-report outliers but do not write. Group identical approved changes, use a fresh idempotency key per
-write, and read back the keyword state. Budget changes are a separate decision. →
-`references/playbooks/bid-optimization.md`.
+**5. Keyword bid review.** If the user has not selected a success metric, offer `cost_per_paid`,
+`cost_per_trial`, then net `roas` at day X, in that order, and get the target. Ask for a cohort
+window only for a cohort root; cost metrics use the report date window directly. Read keyword
+metadata, then rank with one server-side metrics call. Separate increase, keep, decrease,
+pause-candidate, and insufficient-data rows. Without a target, report outliers but do not write.
+Group identical approved changes, use a fresh idempotency key per write, and read back the keyword
+state. Budget changes are a separate decision. → `references/playbooks/bid-optimization.md`.
 
 **6. Pause or resume.** Campaigns, ad groups, ads:
 `update <id> --status ENABLED|PAUSED --idempotency-key <key>`. Keywords:

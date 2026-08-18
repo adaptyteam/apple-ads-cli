@@ -29,10 +29,10 @@ Which Discovery ad groups are missing cross-negatives for verified Exact owners?
 ```
 Which of my ad groups lost money last month at day-30 cohort ROAS?
 How did last week compare to the week before?
-Show me the 20 worst keywords by day-30 gross ROAS.
+Show me the 20 worst keywords by day-30 net ROAS.
 Which US terms appear for these three competitor App Store ids but not in my active keywords?
 Which competitor terms are blocked by my current negatives?
-Which keyword bids should increase under my day-30 proceeds ROAS target?
+Which keyword bids should increase under my day-30 net ROAS target?
 How many active campaigns do I have?
 Why isn't this ad running?
 ```
@@ -53,7 +53,8 @@ Set up a rule that pauses any keyword spending over $50 with no conversion, and 
 For "which keywords lost money last month", a correct answer:
 
 1. runs preflight,
-2. asks which cohort window matches the subscription period before ranking anything,
+2. offers cost per paid, cost per trial, then net ROAS in that order, and asks for a cohort window
+   only if the selected metric is cohort-aware,
 3. answers in **one** metrics call, sorted server-side,
 4. splits the result into pays-back / does-not / not-enough-data,
 5. recommends an action and its playbook — and does not execute it.

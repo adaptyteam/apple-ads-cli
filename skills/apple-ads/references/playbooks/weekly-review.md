@@ -31,10 +31,18 @@ Ask for any missing decision-changing input:
 
 - exact report window;
 - whether to compare it with another period;
-- the success metric and revenue variant;
-- the cohort window that matches the app's subscription model;
+- the success metric; when offering choices, use this exact priority: `cost_per_paid`,
+  `cost_per_trial`, then net `roas` at day X;
 - any user-defined target or guardrail;
+- the cohort window that matches the app's subscription model, only when the selected metric is a
+  cohort root: `revenue`, `roas`, `arpu`, `arppu`, `arpas`, or `roi`;
 - optional app or campaign focus.
+
+Revenue-family analysis always uses the `net_` variant. Do not ask the user to choose gross,
+proceeds, or net. `--by-days` and `--order-by-day` apply only to the six cohort roots above. For
+`cost_per_paid`, `cost_per_trial`, and every other non-cohort metric, use the value aggregated over
+the requested date window as returned: never ask for a cohort window, pass a day flag, or attach a
+`day-X` label.
 
 If the user does not supply a business target, report facts and outliers without calling them good,
 bad, profitable, or unprofitable. Do not add an unrequested period comparison.
@@ -44,10 +52,12 @@ bad, profitable, or unprofitable. Do not add an unrequested period comparison.
 Use at most four analytics-family calls:
 
 1. **Overview and trend.** One `metrics overview` call across the requested window. Request spend,
-   `total_installs`, `adapty_installs`, the selected cost metric, and the selected cohort root. A
-   per-period series already contains the comparison; never call once per period.
+   `total_installs`, `adapty_installs`, and the selected success metric. For a cohort root, request
+   its root and the approved `--by-days` window, then read the `net_` value. A per-period series
+   already contains the comparison; never call once per period.
 2. **Campaign outliers.** One server-sorted campaign call using the user-approved metric, direction,
-   and cohort window.
+   and, only for a cohort root, cohort window. Rank revenue-family metrics by their expanded `net_`
+   name.
 3. **Keyword outliers.** One server-sorted keyword call only when the campaign result warrants that
    level or the user requested it.
 4. **Search terms.** One scoped call only when the report is expected to end in growth or waste
@@ -80,7 +90,8 @@ relative_gap = absolute_gap / apple_installs  # only when apple_installs > 0
 
 ## Decision method
 
-1. State the metric, date window, cohort window, and revenue variant before the result.
+1. State the metric and date window before the result. State the cohort window only for a cohort
+   root; name net as the revenue variant without asking the user to choose it.
 2. Separate direct observations from explanations.
 3. Choose up to two positive changes and two concerns supported by the requested metric.
 4. Mark thin or immature cohorts `insufficient_data`.
@@ -108,7 +119,7 @@ Every finding names evidence ids, entities, metrics, windows, confidence, and li
 ## Example
 
 ```text
-Direction: spend rose 8% in the requested comparison while day-30 proceeds ROAS was flat.
+Direction: spend rose 8% in the requested comparison while day-30 net ROAS was flat.
 Apple vs Adapty installs: 540 vs 497, a gap of 43 (8.0% of Apple's count). The systems use
 different attribution and event definitions, so this is a comparison signal, not proof of an
 error. Primary action: review bids for the three mature keywords below the user's ROAS target.
