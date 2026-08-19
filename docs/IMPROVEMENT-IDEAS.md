@@ -40,8 +40,8 @@ Minimum case set:
 - one successful case for each of the eight flagship workflows;
 - one insufficient-data case for each workflow;
 - audit versus operator versus strategy routing conflicts;
-- Apple installs equal to zero;
-- missing Adapty installs;
+- a metric missing from a `metrics overview` response;
+- `cost_per_trial` requested for an app with no free trial;
 - Market Intelligence response without `byApps`;
 - more than five competitor App Store ids;
 - an opportunity already present as an active keyword;
@@ -298,6 +298,7 @@ Do not add these until a concrete product need changes the decision:
 
 - more top-level skills;
 - a Maximize readiness workflow;
+- any comparison between Apple install counts and Adapty install counts;
 - deep attribution reconciliation;
 - a universal account health score;
 - universal CPA, ROAS, or bid-change percentages;

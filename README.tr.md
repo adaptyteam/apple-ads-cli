@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md  i18n-hash: 7c1ea480b94019ca  -->
+<!-- i18n-source: README.md  i18n-hash: 0d1ee2588d9c2cc3  -->
 
 [English](README.md) · [简体中文](README.zh-CN.md) · **Türkçe**
 
@@ -73,7 +73,7 @@ Ayarlar → Capabilities → kod çalıştırmayı etkinleştirin → ağ çık�
 | | |
 |---|---|
 | **`apple-ads`** | Uygulayıcı. Performansı okur, teklifleri ve bütçeleri değiştirir, anahtar kelime ve negatif ekler, arama terimlerini hasat eder, kampanyaları başlatır ve durdurur — hepsi CLI üzerinden ve para harcayan her işlemden önce onay alarak. |
-| **`apple-ads-audit`** | Salt okunur denetçi. Hesap sağlığını, yayın durumunu, canlı yapıyı, trafik sahipliğini, yinelenen tam eşleşmeli anahtar kelimeleri ve aynı tarih aralığında Apple ile Adapty kurulumlarının basit karşılaştırmasını kontrol eder. Hiçbir şeyi değiştirmez. |
+| **`apple-ads-audit`** | Salt okunur denetçi. Hesap sağlığını, yayın durumunu, canlı yapıyı, trafik sahipliğini, yinelenen tam eşleşmeli anahtar kelimeleri ve bir performans özetini — harcama, gösterim, dokunma, ortalama CPT, yükleme, CPI, deneme başına maliyet ve ödeme başına maliyet — kontrol eder. Hiçbir şeyi değiştirmez. |
 | **`apple-ads-strategy`** | Planlayıcı. **Hesap, CLI veya abonelik gerektirmez.** "Bir TV kumandası uygulamam var, nereden başlamalıyım" sorusunu eksiksiz bir hesap yapısına, anahtar kelime taksonomisine, başlangıç bütçesine ve negatif listesine dönüştürür. |
 | **Oyun kitapları** | Haftalık kontrol · hesap sağlığı · yapı denetimi · kohort ROAS · anahtar kelime teklif incelemesi · Market Intelligence fırsatları · arama terimi hasadı · negatif anahtar kelime madenciliği · CPP yönlendirme · bütçe yeniden dağıtımı · kampanya başlatma · kontrolsüz harcama · otomasyon kuralları. |
 | **Dikey rehberler** | Kategoriye özel oyun kitapları — talep profili, anahtar kelime taksonomisi, hesap yapısı, başlangıç ekonomisi ve o kategoriye özgü başarısızlık biçimleri. |

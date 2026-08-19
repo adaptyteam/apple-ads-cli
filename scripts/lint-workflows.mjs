@@ -2,7 +2,7 @@
 // Behavioral contracts for the flagship Apple Ads workflows.
 //
 // The playbook linter validates shape and command existence. This file protects the decisions that
-// are easy to weaken accidentally: read-only audit boundaries, simple install comparison, Market
+// are easy to weaken accidentally: read-only audit boundaries, the standard metric set, Market
 // Intelligence detail, and mutation ordering.
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
@@ -71,8 +71,6 @@ if (setupDescription.includes('402') || setupDescription.includes('ads_manager_s
 }
 
 requireText(auditSkill, 'This skill has no write', 'explicit read-only audit boundary')
-requireText(auditSkill, 'relative_gap = absolute_gap / apple_installs', 'install-gap formula')
-requireText(auditSkill, 'only when `apple_installs > 0`', 'zero-denominator guard')
 
 const WRITE_COMMAND = /asa\s+(?:campaigns|ad-groups|ads|keywords|negative-keywords|product-pages|automations)\s+(?:create|update|add|sync|run)/
 for (const path of [accountHealth, structureAudit]) {
@@ -82,11 +80,37 @@ for (const path of [accountHealth, structureAudit]) {
   if (WRITE_COMMAND.test(uses)) fail(path, `audit playbook declares a write command in uses: ${uses}`)
 }
 
+// The standard metric set. Both reporting workflows request all of it in the single overview call
+// they already make, so trimming a row saves nothing and only makes the report less decidable.
+const STANDARD_METRICS = [
+  'spend',
+  'impressions',
+  'taps',
+  'avg_cpt',
+  'total_installs',
+  'total_avg_cpi',
+  'cost_per_trial',
+  'cost_per_paid',
+]
+const NO_INSTALL_GAP = 'Never compare Apple install counts with Adapty install counts'
+const GAP_REMNANTS = [
+  'adapty_installs',
+  'absolute_gap',
+  'relative_gap',
+  'different attribution and event definitions',
+]
+
+for (const path of [accountHealth, weekly, reviewCommand]) {
+  for (const metric of STANDARD_METRICS) requireText(path, `\`${metric}\``, `standard metric ${metric}`)
+}
+for (const path of [accountHealth, weekly, auditSkill, reviewCommand]) {
+  for (const remnant of GAP_REMNANTS) forbidText(path, remnant, `install-gap remnant: ${remnant}`)
+}
+for (const path of [accountHealth, weekly, auditSkill]) {
+  requireText(path, NO_INSTALL_GAP, 'explicit install-gap non-goal')
+}
 for (const path of [accountHealth, weekly]) {
-  requireText(path, 'total_installs', 'Apple install metric')
-  requireText(path, 'adapty_installs', 'Adapty install metric')
-  requireText(path, 'only when', 'zero-safe percentage rule')
-  requireText(path, 'different attribution and event definitions', 'plain install-gap explanation')
+  requireText(path, 'whether the app offers a free trial', 'free-trial gate for cost_per_trial')
 }
 if (frontmatterValue(read(weekly), 'risk') !== 'read-only') fail(weekly, 'weekly check-in must stay read-only')
 

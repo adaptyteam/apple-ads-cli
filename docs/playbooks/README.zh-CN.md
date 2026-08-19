@@ -10,7 +10,7 @@
 | 账户健康 | 在不做任何修改的前提下找出线上账户需要关注的问题 | [`account-health.md`](../../skills/apple-ads-audit/references/playbooks/account-health.md) |
 | 结构审计 | 查找重复归属、交叉否定词和线上层级冲突 | [`structure-audit.md`](../../skills/apple-ads-audit/references/playbooks/structure-audit.md) |
 | 同期群 ROAS | 按续订窗口判断哪些关键词真正回本 | [`cohort-roas.md`](../../skills/apple-ads/references/playbooks/cohort-roas.md) |
-| 每周检查 | 最多四次分析调用，给出趋势、安装量对比、异常项和一个行动 | [`weekly-review.md`](../../skills/apple-ads/references/playbooks/weekly-review.md) |
+| 每周检查 | 最多四次分析调用，基于标准指标集给出趋势、异常项和一个行动 | [`weekly-review.md`](../../skills/apple-ads/references/playbooks/weekly-review.md) |
 | 关键词机会 | 从 Market Intelligence 获取按 App 和国家划分的竞品搜索词 | [`keyword-opportunity.md`](../../skills/apple-ads/references/playbooks/keyword-opportunity.md) |
 | 关键词出价审查 | 通过同期群成熟度门槛提出基于证据的出价调整 | [`bid-optimization.md`](../../skills/apple-ads/references/playbooks/bid-optimization.md) |
 | 搜索词收割 | 把真实查询变成已验证的精确匹配归属和交叉否定词 | [`search-term-harvesting.md`](../../skills/apple-ads/references/playbooks/search-term-harvesting.md) |

@@ -1,6 +1,6 @@
 ---
 name: apple-ads-audit
-description: 'Use for read-only diagnostics of a connected Apple Ads account: account health, live campaign and ad-group structure, traffic ownership, duplicate exact keywords, missing cross-negatives, serving problems, spend without results, or a simple same-window comparison of Apple total installs and Adapty installs. Triggers on "audit my Apple Ads account", "what is broken", "which campaigns need attention", "is my live structure correct", or "why are Apple and Adapty installs different". Never use it to design a new account, run a weekly review, or make changes.'
+description: 'Use for read-only diagnostics of a connected Apple Ads account: account health, live campaign and ad-group structure, traffic ownership, duplicate exact keywords, missing cross-negatives, serving problems, spend without results, or a standard performance snapshot of spend, impressions, taps, avg CPT, installs, CPI, cost per trial and cost per paid. Triggers on "audit my Apple Ads account", "what is broken", "which campaigns need attention", "is my live structure correct", or "which campaigns are wasting spend". Never use it to design a new account, run a weekly review, or make changes.'
 license: MIT
 ---
 
@@ -33,7 +33,7 @@ Run `adapty asa whoami` first in every session.
 
 Open `references/INDEX.md` and read the one playbook it names.
 
-- Overall health, serving, performance warnings, or Apple-versus-Adapty installs →
+- Overall health, serving, performance warnings, or a performance snapshot →
   `references/playbooks/account-health.md`.
 - Live structure, duplicate targets, traffic ownership, or missing cross-negatives →
   `references/playbooks/structure-audit.md`.
@@ -103,19 +103,16 @@ Use `critical` only for a confirmed serving failure or a user-defined limit that
 breached. Use `attention` for a supported concern without that proof. Never invent a numeric health
 score or universal threshold.
 
-## Simple install comparison
+## Standard performance snapshot
 
-This is the entire attribution scope of this skill:
+Every performance read in this skill reports one metric set for the requested scope and exact date
+window: spend, impressions, taps, avg CPT, installs, CPI, cost per trial, and cost per paid. The
+metric names, the free-trial gate on cost per trial, and the missing-value rule live in
+`references/playbooks/account-health.md`. Use that set instead of picking metrics per question.
 
-- Compare `total_installs` from Apple with `adapty_installs` from Adapty for the same scope and exact
-  date window.
-- Show both values and `absolute_gap = apple_installs - adapty_installs`.
-- Show `relative_gap = absolute_gap / apple_installs` only when `apple_installs > 0`.
-- If either value is absent, mark the comparison `unknown`. If Apple installs are zero, say the
-  percentage is undefined.
-- Explain plainly that the systems use different attribution and event definitions, so an exact
-  match is not expected.
-- Do not diagnose attribution, assign fault, or claim a cause.
+Attribution is not in scope. Never compare Apple install counts with Adapty install counts, never
+report a gap or a percentage of Apple's count between them, and never offer an attribution
+explanation for a difference between two systems.
 
 ## Evidence and confidence
 
