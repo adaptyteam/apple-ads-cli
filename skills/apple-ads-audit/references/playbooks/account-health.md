@@ -17,11 +17,13 @@ structure redesign, weekly ritual, or attribution investigation.
 
 - The user asks whether a connected account is healthy or what is broken.
 - Spend, installs, serving, or entity state looks suspicious.
-- The user wants a simple same-window Apple-versus-Adapty install comparison.
+- The user wants a performance snapshot for the account over a date window.
 - The user wants to know which campaigns deserve a deeper follow-up.
 
 ## Do not apply when
 
+- The user asks about attribution. Never compare Apple install counts with Adapty install counts,
+  never report an install gap, and never explain a difference between the two systems.
 - The account does not exist yet → `apple-ads-strategy`.
 - The primary question is duplicate targeting or traffic ownership → `structure-audit.md`.
 - The user asks for a scheduled weekly report → `apple-ads` and `weekly-review.md`.
@@ -33,6 +35,8 @@ Resolve or ask for:
 
 - company and app;
 - exact date window;
+- whether the app offers a free trial — when the answer is no, drop the `cost_per_trial` row from the
+  snapshot;
 - the business success metric, and a cohort window only when that metric is `revenue`, `roas`,
   `arpu`, `arppu`, `arpas`, or `roi`, if the user wants value judgments;
 - any user-defined spend, CPA, or ROAS limits;
@@ -47,10 +51,11 @@ bad, profitable, or unprofitable.
 2. Resolve the app and requested campaign scope.
 3. Read scoped campaign, ad-group, and ad counts and statuses. Use `--page-size 1` when only the
    count is needed.
-4. Read one account overview for spend, Apple installs, Adapty installs, the requested cost metric,
-   and the requested cohort root. The time series supplies the trend; do not call once per period.
+4. Read one account overview for the whole standard metric set below plus the requested cohort root.
+   The time series supplies the trend; do not call once per period.
 5. Read one ranked campaign result only when the user asks which campaigns need attention. Use the
-   user's metric and direction, adding a cohort window only for a cohort root.
+   user's metric and direction, request the same standard metric set, and add a cohort window only
+   for a cohort root.
 6. Drill into one suspicious level only when the broad evidence cannot answer the question.
 7. Read `ads get` only for an ad whose serving state requires an explanation.
 8. Read keyword, negative, product-page, or creative inventory only when the corresponding control
@@ -76,11 +81,31 @@ drill-down question. Metadata reads do not justify unscoped lists.
 
 ### Performance
 
+The snapshot is one fixed metric set, in this order, for the requested scope and window. All of it
+comes back from the single overview call in step 4 — extra metrics on one call cost no extra calls.
+
+| Row | Metric | Notes |
+|---|---|---|
+| Spend | `spend` | use `local_spend` only when the user asks for account currency |
+| Impressions | `impressions` | |
+| Taps | `taps` | |
+| Avg CPT | `avg_cpt` | |
+| Installs | `total_installs` | Apple's own count, reported on its own |
+| CPI | `total_avg_cpi` | Apple's average cost per install. It counts redownloads. Read the field; never recompute it as spend ÷ installs |
+| Cost per trial | `cost_per_trial` | only when the user said the app has a free trial |
+| Cost per paid | `cost_per_paid` | |
+
+- A metric absent from the response is `unknown`, never zero.
+- `cost_per_trial` and `cost_per_paid` are values for the requested date window. Never pass
+  `--by-days` / `--order-by-day` for them and never attach a `day-X` label.
 - State the metric and date window before interpreting it. State a cohort window only for a cohort
   root, and always use net rather than asking the user to choose a revenue variant.
 - Keep immature cohorts in `unknown` or `insufficient evidence`.
 - Compare against the user's target or the account's own requested historical period. Do not invent
-  a universal threshold.
+  a universal threshold. `total_avg_cpi` is not the benchmarks skill's CPA — that figure is spend per
+  download, so check the denominator before placing them side by side.
+- Never compare Apple install counts with Adapty install counts, and never report a gap or a
+  percentage of Apple's count between them.
 
 ### Inventory readiness
 
@@ -88,21 +113,6 @@ drill-down question. Metadata reads do not justify unscoped lists.
   only for the requested scope.
 - Absence is not automatically a defect: mark a control `not_applicable` when the campaign type does
   not need that inventory.
-
-### Apple versus Adapty installs
-
-Use values from the same overview response and exact date window:
-
-```text
-apple_installs = total_installs
-adapty_installs = adapty_installs
-absolute_gap = apple_installs - adapty_installs
-relative_gap = absolute_gap / apple_installs  # only when apple_installs > 0
-```
-
-Report the two values, the signed absolute gap, and the percentage only when defined. Add one plain
-sentence: Apple and Adapty use different attribution and event definitions, so an exact match is not
-expected. Do not investigate or assign fault.
 
 ## Decision rules
 
@@ -124,7 +134,7 @@ Return these sections in order:
 2. **Critical findings** — confirmed failures only.
 3. **Needs attention** — supported concerns and their impact.
 4. **Healthy signals** — concise evidence, not reassurance.
-5. **Apple vs Adapty installs** — same-window values and the limited explanation above.
+5. **Performance snapshot** — the standard metric set above for the requested scope and window.
 6. **Unknowns** — missing targets, maturity, metadata, or unsupported causes.
 7. **Recommended actions** — one primary follow-up and an optional backlog.
 
@@ -133,17 +143,17 @@ Every finding must include status, observation, evidence ids, confidence, limita
 ## Example
 
 ```text
-ATTENTION — Campaign C-17 spent $420 in the selected window and Apple reported 96 installs.
-Adapty reported 81 installs for the same dates: a gap of 15 installs (15.6% of Apple's count).
-The systems use different attribution and event definitions, so this gap is a comparison signal,
-not proof that either system is wrong. Evidence: E3. Confidence: high for the counts, low for cause.
+ATTENTION — Campaign C-17 spent $420 in the selected window on 1,050 taps at an avg CPT of $0.40,
+and produced 96 installs at a CPI of $4.38 — roughly double the account's $2.08. Cost per paid is
+unknown for this campaign: the window returned no paid conversions. Evidence: E3. Confidence: high
+for the counts, low for cause. Next step: check whether the ad group's keywords match intent.
 ```
 
 ## Failure modes
 
-- A mismatched window invalidates the install comparison; rerun one same-window overview.
-- Apple installs equal to zero makes the percentage undefined; show no percentage.
-- Missing Adapty installs makes the comparison `unknown`, not zero.
+- A metric absent from the response is `unknown`; printing it as zero invents a result.
+- Reporting `cost_per_trial` for an app with no free trial produces a meaningless row; ask first.
+- `total_avg_cpi` read against a benchmark CPA compares two different denominators.
 - No change history means a timing relationship is not causation.
 - A category benchmark is optional context, not a substitute for the user's target.
 - Never finish this playbook by executing a recommended action.

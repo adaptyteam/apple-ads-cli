@@ -23,7 +23,9 @@ recommend one action, but a separate playbook and a separate confirmation execut
 
 - The user wants a broad health or structure diagnosis → `apple-ads-audit`.
 - The user already chose a bid, negative, harvest, or CPP action → open that playbook.
-- The user asks for a deep attribution investigation. This playbook only compares install counts.
+- The user asks for an attribution investigation. Attribution is out of scope here and everywhere
+  else in this skill. Never compare Apple install counts with Adapty install counts, never report an
+  install gap, and never explain one away.
 
 ## Required inputs
 
@@ -31,6 +33,9 @@ Ask for any missing decision-changing input:
 
 - exact report window;
 - whether to compare it with another period;
+- whether the app offers a free trial — ask this before offering a success metric. When the answer is
+  no, drop the cost-per-trial row from the standard metric set and do not offer cost per trial as a
+  success metric;
 - the success metric; when offering choices, use this exact priority: `cost_per_paid`,
   `cost_per_trial`, then net `roas` at day X;
 - any user-defined target or guardrail;
@@ -51,13 +56,14 @@ bad, profitable, or unprofitable. Do not add an unrequested period comparison.
 
 Use at most four analytics-family calls:
 
-1. **Overview and trend.** One `metrics overview` call across the requested window. Request spend,
-   `total_installs`, `adapty_installs`, and the selected success metric. For a cohort root, request
-   its root and the approved `--by-days` window, then read the `net_` value. A per-period series
-   already contains the comparison; never call once per period.
+1. **Overview and trend.** One `metrics overview` call across the requested window. Request the whole
+   standard metric set below plus the selected success metric. For a cohort root, request its root and
+   the approved `--by-days` window, then read the `net_` value. A per-period series already contains
+   the comparison; never call once per period.
 2. **Campaign outliers.** One server-sorted campaign call using the user-approved metric, direction,
-   and, only for a cohort root, cohort window. Rank revenue-family metrics by their expanded `net_`
-   name.
+   and, only for a cohort root, cohort window. Request the same standard metric set on that call so
+   the outlier rows are readable against the account totals. Rank revenue-family metrics by their
+   expanded `net_` name.
 3. **Keyword outliers.** One server-sorted keyword call only when the campaign result warrants that
    level or the user requested it.
 4. **Search terms.** One scoped call only when the report is expected to end in growth or waste
@@ -70,23 +76,32 @@ returned coverage and do not claim a global worst row.
 Counting entities is not an analytics call. A scoped list with `--page-size 1` already returns the
 count.
 
-## Simple Apple versus Adapty install comparison
+## Standard metric set
 
-Use values from the same overview response and date window:
+Every check-in reports these rows, in this order, for the requested window. All of them come back
+from the one overview call in step 1 — adding metrics to a call costs no extra calls.
 
-```text
-apple_installs = total_installs
-adapty_installs = adapty_installs
-absolute_gap = apple_installs - adapty_installs
-relative_gap = absolute_gap / apple_installs  # only when apple_installs > 0
-```
+| Row | Metric | Notes |
+|---|---|---|
+| Spend | `spend` | use `local_spend` only when the user asks for account currency |
+| Impressions | `impressions` | |
+| Taps | `taps` | |
+| Avg CPT | `avg_cpt` | |
+| Installs | `total_installs` | the denominator behind CPI; report it as Apple's own count |
+| CPI | `total_avg_cpi` | Apple's average cost per install. It counts redownloads. Read the field; never recompute it as spend ÷ installs |
+| Cost per trial | `cost_per_trial` | only when the user said the app has a free trial |
+| Cost per paid | `cost_per_paid` | |
 
-- Show both values and the signed absolute gap.
-- Show the percentage only when Apple installs are greater than zero.
-- Treat a missing value as unknown, not zero.
-- Explain in one sentence that Apple and Adapty use different attribution and event definitions, so
-  exact equality is not expected.
-- Do not assign fault or investigate attribution.
+- A metric the response did not return is `unknown`, never zero.
+- With a comparison period, give each row its current value, its prior value, and the signed delta.
+  The per-period series in the same response supplies both sides.
+- `cost_per_trial` and `cost_per_paid` are values for the requested date window. Never pass
+  `--by-days` / `--order-by-day` for them and never attach a `day-X` label.
+- Call a row good, bad, profitable, or unprofitable only when the user gave a target for it.
+- `total_avg_cpi` is not the benchmarks skill's CPA. That figure is spend per download; check the
+  denominator before putting the two side by side, and never rename one to the other.
+- Never compare Apple install counts with Adapty install counts, and never report a gap, a
+  percentage of Apple's count, or an attribution explanation between them.
 
 ## Decision method
 
@@ -105,30 +120,39 @@ one caused the other.
 
 Return these sections in order:
 
-1. **Direction** — spend, Apple installs, Adapty installs, selected cost metric, and selected value
-   metric for the requested period or comparison.
-2. **Apple vs Adapty installs** — the limited same-window comparison above.
-3. **Two positive changes** — or fewer when evidence does not support two.
-4. **Two concerns** — confirmed observations, not invented failures.
-5. **Primary action** — one read-only recommendation and its operator playbook.
-6. **Backlog** — optional later checks.
-7. **Unknowns and confidence** — targets, maturity, scope, or unavailable causes.
+1. **Direction** — the standard metric set for the requested period or comparison, plus the selected
+   value metric when it is not already one of those rows.
+2. **Two positive changes** — or fewer when evidence does not support two.
+3. **Two concerns** — confirmed observations, not invented failures.
+4. **Primary action** — one read-only recommendation and its operator playbook.
+5. **Backlog** — optional later checks.
+6. **Unknowns and confidence** — targets, maturity, scope, or unavailable causes.
 
 Every finding names evidence ids, entities, metrics, windows, confidence, and limitations.
 
 ## Example
 
 ```text
-Direction: spend rose 8% in the requested comparison while day-30 net ROAS was flat.
-Apple vs Adapty installs: 540 vs 497, a gap of 43 (8.0% of Apple's count). The systems use
-different attribution and event definitions, so this is a comparison signal, not proof of an
-error. Primary action: review bids for the three mature keywords below the user's ROAS target.
+Direction (Aug 10-16 vs Aug 3-9)
+Spend           $4,180    $3,870    +8.0%
+Impressions     612,400   588,100   +4.1%
+Taps            9,240     9,010     +2.6%
+Avg CPT         $0.45     $0.43     +4.7%
+Installs        2,010     1,940     +3.6%
+CPI             $2.08     $1.99     +4.5%
+Cost per trial  $9.40     $8.85     +6.2%
+Cost per paid   $31.20    $29.60    +5.4%
+
+Spend rose 8% while taps rose 2.6%, so the whole increase landed in CPT. Cost per paid moved
+with it and is $1.20 above the user's $30 guardrail. Primary action: review bids for the three
+mature keywords carrying that CPT increase.
 ```
 
 ## Failure modes
 
-- Different install windows invalidate the comparison.
-- Apple installs equal to zero makes the percentage undefined.
+- Reporting `cost_per_trial` for an app with no free trial produces a meaningless row; ask first.
+- `total_avg_cpi` read against a benchmark CPA compares two different denominators.
+- A metric absent from the response is `unknown`; printing it as zero invents a result.
 - A monthly cohort read at day 7 is immature, not losing.
 - A server-sorted top page does not prove the global worst when more pages exist.
 - No user-defined target means no performance verdict and no mutation proposal.

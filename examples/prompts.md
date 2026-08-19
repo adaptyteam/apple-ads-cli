@@ -16,7 +16,7 @@ Structure an account for a language-learning app selling annual subscriptions in
 ```
 Audit this live Apple Ads account and show me what needs attention. Do not change anything.
 Which campaigns are confirmed not to be serving, and what evidence explains each one?
-How far apart are Apple total installs and Adapty installs for the same dates? Keep it simple.
+Give me spend, impressions, taps, avg CPT, installs, CPI and cost per paid for last week.
 Are Brand, Competitor, Discovery and Exact traffic separated correctly in this live account?
 Where do active Exact keywords have more than one owner?
 Which Discovery ad groups are missing cross-negatives for verified Exact owners?

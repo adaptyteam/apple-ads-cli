@@ -49,9 +49,10 @@ policy, identify the bucket first and ask for the exact proposed amount before w
 
 1. Read scoped active and paused keyword metadata to obtain ids, current bids, status, text, and
    match type.
-2. Make one keyword metrics request for spend, Apple and Adapty installs, the selected cost/value
-   metrics, rank, search popularity, and impression midpoint. Only for a cohort root, include the
-   approved `--by-days` window and rank by the expanded `net_` metric.
+2. Make one keyword metrics request for `spend`, `impressions`, `taps`, `avg_cpt`, `total_installs`,
+   `total_avg_cpi`, the selected cost/value metrics, rank, search popularity, and impression midpoint.
+   Only for a cohort root, include the approved `--by-days` window and rank by the expanded `net_`
+   metric.
 3. Match metrics rows to the scoped ids. `metrics` has no scope filters; an account-wide row is not
    permission to act outside the requested scope.
 4. Record coverage. If the full scoped set does not fit in the returned page, do not claim a complete
