@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md  i18n-hash: 7c1ea480b94019ca  -->
+<!-- i18n-source: README.md  i18n-hash: 68dfcb975c8673ad  -->
 
 [English](README.md) · **简体中文** · [Türkçe](README.tr.md)
 
