@@ -1,4 +1,4 @@
-<!-- GENERATED — synced from adaptyteam/adapty-cli@main (docs/agent/asa-metrics.md). Do not edit here.
+<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.7.0 (docs/agent/asa-metrics.md). Do not edit here.
      Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Apple Search Ads — Metrics and Analytics

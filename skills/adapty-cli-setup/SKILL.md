@@ -4,7 +4,7 @@ license: MIT
 description: Use when the Adapty CLI needs installing or authenticating before any Apple Search Ads work — a fresh Cowork or cloud session, "adapty: command not found", AuthRequiredError, an expired auth code, or connecting an Apple Search Ads account. Triggers on "install the Adapty CLI", "set up adapty", "adapty auth login", "connect Apple Search Ads", "not authenticated", or any Apple Ads request made in a session where the CLI is not yet installed.
 ---
 
-<!-- GENERATED — synced from adaptyteam/adapty-cli@main (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
+<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.7.0 (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
      Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Adapty CLI setup
