@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md  i18n-hash: 7c1ea480b94019ca  -->
+<!-- i18n-source: README.md  i18n-hash: 68dfcb975c8673ad  -->
 
 [English](README.md) · **简体中文** · [Türkçe](README.tr.md)
 
@@ -129,6 +129,6 @@ Apple Ads **没有沙箱环境**。每一次调用都作用于线上，花的都
 
 - [Adapty CLI](https://github.com/adaptyteam/adapty-cli) · [CLI 文档](https://adapty.io/docs/developer-cli-quickstart)
 - [Ads Manager 技能文档](https://adapty.io/docs/developer-cli-ads-manager-skill)
-- [Adapty SDK 接入技能](https://github.com/adaptyteam/adapty-sdk-integration-skill)
+- [Adapty SDK 接入技能](https://github.com/adaptyteam/adapty-skills)
 
 欢迎提交 Issue 和 Pull Request，尤其欢迎新的垂类指南。请参考[模板](skills/apple-ads-strategy/references/verticals/_TEMPLATE.md)。
