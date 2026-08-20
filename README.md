@@ -129,6 +129,6 @@ Apple Ads has **no sandbox**. Every call hits production and spends real money.
 
 - [Adapty CLI](https://github.com/adaptyteam/adapty-cli) · [CLI docs](https://adapty.io/docs/developer-cli-quickstart)
 - [Ads Manager skill docs](https://adapty.io/docs/developer-cli-ads-manager-skill)
-- [Adapty SDK integration skill](https://github.com/adaptyteam/adapty-sdk-integration-skill)
+- [Adapty SDK integration skill](https://github.com/adaptyteam/adapty-skills)
 
 Issues and pull requests welcome — especially new vertical guides. See the [template](skills/apple-ads-strategy/references/verticals/_TEMPLATE.md).

@@ -129,6 +129,6 @@ Apple Ads'in **test ortamı yoktur.** Her çağrı canlıya gider ve gerçek par
 
 - [Adapty CLI](https://github.com/adaptyteam/adapty-cli) · [CLI dokümantasyonu](https://adapty.io/docs/developer-cli-quickstart)
 - [Ads Manager beceri dokümantasyonu](https://adapty.io/docs/developer-cli-ads-manager-skill)
-- [Adapty SDK entegrasyon becerisi](https://github.com/adaptyteam/adapty-sdk-integration-skill)
+- [Adapty SDK entegrasyon becerisi](https://github.com/adaptyteam/adapty-skills)
 
 Issue ve pull request'ler memnuniyetle karşılanır — özellikle yeni dikey rehberler. [Şablona](skills/apple-ads-strategy/references/verticals/_TEMPLATE.md) bakın.
