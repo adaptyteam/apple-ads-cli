@@ -1,4 +1,4 @@
-<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.8.0 (docs/agent/asa-management.md). Do not edit here.
+<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.8.1 (docs/agent/asa-management.md). Do not edit here.
      Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Apple Search Ads — Managing Campaigns
