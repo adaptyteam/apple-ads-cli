@@ -4,7 +4,7 @@ license: MIT
 description: Use when the Adapty CLI needs installing or authenticating before any Apple Search Ads work — a fresh Cowork or cloud session, "adapty: command not found", AuthRequiredError, an expired auth code, or connecting an Apple Search Ads account. Triggers on "install the Adapty CLI", "set up adapty", "adapty auth login", "connect Apple Search Ads", "not authenticated", or any Apple Ads request made in a session where the CLI is not yet installed.
 ---
 
-<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.8.3 (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
+<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.8.5 (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
      Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Adapty CLI setup
@@ -124,7 +124,7 @@ the dashboard usually means the token is scoped elsewhere.
 
 | What you see | What it means | What to do |
 | --- | --- | --- |
-| `ERROR node_missing` / `node_too_old` | Node.js below 18 | Install Node 18+; nothing else will work |
+| `ERROR node_missing` / `node_too_old` | Node.js below 22 | Install Node 22+; nothing else will work |
 | `ERROR npm_install_failed`, log shows a network, DNS or registry error | **In Cowork or any sandbox: egress is off, or the domains are not allowlisted.** The most common cloud failure, and not fixable from the shell | Settings → Capabilities → enable code execution → allow network egress → an access mode that permits package managers → add **both** `adapty.io` and `*.adapty.io` (a wildcard does not cover the apex domain). **Settings apply when a task starts**, so after changing them the user must start a new task; changing them mid-conversation does nothing |
 | `ERROR npm_install_failed`, log shows `EACCES` or a write error | Install failed even with a user prefix | Read `$TMPDIR/adapty-setup/npm.log`. Never re-run under `sudo` |
 | `ERROR adapty_not_on_path` | Installed, but the global bin dir is not on `PATH` | Export the path the error prints |
