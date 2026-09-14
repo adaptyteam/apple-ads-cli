@@ -4,7 +4,7 @@ license: MIT
 description: Use when the Adapty CLI needs installing or authenticating before any Apple Search Ads work — a fresh Cowork or cloud session, "adapty: command not found", AuthRequiredError, an expired auth code, or connecting an Apple Search Ads account. Triggers on "install the Adapty CLI", "set up adapty", "adapty auth login", "connect Apple Search Ads", "not authenticated", or any Apple Ads request made in a session where the CLI is not yet installed.
 ---
 
-<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.8.5 (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
+<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.8.6 (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
      Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Adapty CLI setup
@@ -132,7 +132,7 @@ the dashboard usually means the token is scoped elsewhere.
 | `ERROR no_code_minted` | Login started but printed no code | Read `$TMPDIR/adapty-setup/auth.out` |
 | `User code not found or expired` in the browser | The waiter died, or the TTL ran out | Step 1 again, and surface the new code faster |
 | `AuthRequiredError` after `AUTHED` | Almost always a stale `ADAPTY_TOKEN` | `unset ADAPTY_TOKEN`, re-check |
-| `402 ads_manager_subscription_required` | Authenticated fine; the company has no Ads Manager subscription | **Not a setup bug.** Say so plainly and stop. No flag works around it |
+| `402 ads_manager_subscription_required` | Authenticated fine; the company has no Ads Manager access — neither the trial nor a subscription | **Not a setup bug.** Say so plainly and stop. No flag works around it |
 | `NetworkError`, including certificate `-25291` noise | Network or sandbox trust-store access failed before authentication could be checked | Return to the caller's quiet preflight retry. Never install or log in |
 
 ## ADAPTY_TOKEN
