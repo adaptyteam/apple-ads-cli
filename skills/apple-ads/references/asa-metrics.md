@@ -1,4 +1,4 @@
-<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.8.9 (docs/agent/asa-metrics.md). Do not edit here.
+<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.9.2 (docs/agent/asa-metrics.md). Do not edit here.
      Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Apple Search Ads — Metrics and Analytics
@@ -101,7 +101,10 @@ windows](#cohort-windows).
 **Cohort (revenue) metrics**, per gross/proceeds/net: `gross_revenue`, `proceeds_revenue`,
 `net_revenue`, and the same triple for `arpu`, `arppu`, `arpas`, `roas`, `roi`.
 
-**Keyword-only:** `rank`, `search_popularity`, `impression_midpoint`.
+**Keyword-only:** `search_popularity`, `impression_midpoint_all`, `impression_midpoint_first`,
+`rank_all`, `rank_first`. Each comes in two series, all ad slots and the first slot. A share is a
+percent over the period; `rank_*` is the current value and does not follow the period. A keyword
+with no report data reads `0` here.
 
 ## Cohort windows
 
