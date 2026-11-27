@@ -1,10 +1,10 @@
 ---
 title: Autopilot readiness check
-intent: user asks whether keywords or campaigns can go on Adapty's autopilot, what blocks them, or what they must supply before enrolling
+intent: user asks which keywords to put on Adapty's autopilot, whether keywords or campaigns can go there, what blocks them, or what they must supply before enrolling
 kind: procedural
 risk: read-only
 requires: { cli: ">=0.34.0", subscription: true }
-uses: [asa whoami, asa orgs list, asa campaigns get, asa ad-groups get, asa keywords list, asa keywords duplicates, asa keyword-autopilot list, asa automations list, asa automations get, asa change-history list, asa metrics, asa budget-autopilot status, asa budget-autopilot fronts, asa budget-autopilot decisions]
+uses: [asa whoami, asa orgs list, asa campaigns get, asa ad-groups get, asa keywords list, asa keywords duplicates, asa keywords recommend, asa keyword-autopilot list, asa automations list, asa automations get, asa change-history list, asa metrics, asa budget-autopilot status, asa budget-autopilot fronts, asa budget-autopilot decisions]
 time: ~15 min
 ---
 
@@ -18,6 +18,7 @@ handover, never with a write.
 
 - The user asks "can I put this keyword or campaign on autopilot", or what is stopping it.
 - The user asks what target cost per paying user or bid cap to use.
+- The user asks which keywords to put on the keyword autopilot, or asks you to find some.
 - Before any enrollment, even when the user says they are sure.
 
 ## Do not apply when
@@ -29,11 +30,49 @@ handover, never with a write.
 
 ## Required inputs
 
-- scope: the app, the campaigns or ad groups, and the keywords, by name from the user;
+- scope: the app, the campaigns or ad groups, and the keywords, by name from the user; when the user
+  has no keywords yet, the next section applies;
 - the country each keyword is for;
 - the user's own target cost per paying user for each keyword, if they have one, with its currency.
 
 With no target the check still runs and ends in `needs_user_input`; never fill the gap yourself.
+
+## Where candidates come from
+
+The keyword autopilot manages bids of keywords that already exist in Apple Ads. It finds no terms and
+adds no keywords; an enrollment takes the id of an existing keyword, not a text. So "which keywords"
+means which existing ones to hand over, and where new ones come from. With no campaigns in the
+account yet, the question belongs to the `apple-ads-strategy` skill, not here.
+
+- Existing keywords: the choice is the user's. You may show evidence on a metric and window the user
+  agreed to: net ROAS by keyword (`cohort-roas.md`), or observed cost per paying user as in
+  "Choosing the target" below. Never rank keywords by a score of your own.
+- New terms have three sources:
+  - `asa keywords recommend`: ready-made pools for one app. Read each pool's `status` before its
+    list; a cold `brand` or `generic` call can take tens of seconds (limits: "Request budgets" in
+    the reference). `score`, `popularity` and `median_organic_rank` come from third-party organic
+    search data. They can be empty, and `popularity` can be the pool's median instead of the term's
+    own value, so treat them as hints, not as a ranking. `relevance_tier` exists only on generic
+    rows: `top_organic` means the app's median organic rank is 10 or better, `other` also covers an
+    unknown rank. No field is built from revenue, payments or cost: no pool says a term will bring
+    paying users. The competitor pools hold brand terms of the competitors the user selected in the
+    Adapty dashboard, and are empty until they select some; say that these are competitors' brand
+    names before proposing any. Terms come without bids or match types.
+  - Terms competitors appear on → `keyword-opportunity.md`.
+  - Real search terms the account already matched → `search-term-harvesting.md`.
+
+A term is not a candidate until it is a keyword:
+
+- The user picks the terms. Adding them is a write outside this read-only check, with its own
+  confirmation: the user names the ad group, match type and bid. It goes through the playbook that
+  found the term; for pool terms, through the `asa keywords add` row and "Writes and idempotency" of
+  the reference, within the per-call cap in `## Never` of `SKILL.md`.
+- Enroll a keyword by the id it has in `asa keywords list`. A keyword created directly in Apple Ads
+  appears there only after it syncs; an id that is not stored answers 404.
+- Then it goes through the checks below. Enrollment reads neither the keyword's match type nor its
+  past results, and the test counts only from the enrollment. A `BROAD` keyword is ramped toward the
+  cap like an `EXACT` one and matches wider traffic: show the match type next to each candidate. The
+  funnel-data gate is about the app and country, and the target is still the user's number.
 
 ## Keyword checks: what you can verify
 
@@ -144,7 +183,8 @@ more than the cap. Say that plainly and promise neither outcome.
 
 Return the four categories as separate lists, one line per keyword or campaign with its reason, then
 the open inputs, then one handover line naming the launch playbook. State the currency next to
-every number. Propose no write and no target.
+every number. Propose no write and no target. Terms that are not keywords yet go in a separate list,
+each with the playbook that adds it; they get no category.
 
 ## Example
 
@@ -162,6 +202,8 @@ unknown_until_enrollment — KW-25: app link and funnel data show only in the en
 
 - Telling the user a keyword "will be accepted": three gates are visible only in the answer.
 - Calling a rule-based automation harmless, or the autopilot a protection against it.
+- Presenting a recommended term as one that will pay back, or treating a term that is not yet a
+  keyword as enrollable.
 
 ## Related playbooks
 
@@ -169,3 +211,6 @@ unknown_until_enrollment — KW-25: app link and funnel data show only in the en
 - Turn on the budget autopilot → `budget-autopilot-launch.md`.
 - Check what the autopilots did → `autopilot-review.md`.
 - Change or stop an enrolled keyword or campaign → `autopilot-tuning.md`.
+- Which existing keywords already bring paying users → `cohort-roas.md`.
+- Terms competitors appear on → `keyword-opportunity.md`.
+- Real search terms the account already matched → `search-term-harvesting.md`.

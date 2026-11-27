@@ -13,7 +13,7 @@ One row, one file. Read only the file the row names, then come back to `SKILL.md
 | Route a keyword intent to an existing custom product page and ad | `playbooks/creative-setup.md` |
 | Find per-app, per-country keyword opportunities from competitors | `playbooks/keyword-opportunity.md` |
 | Spend is running away, stop it | `playbooks/runaway-spend.md` |
-| Can these keywords or campaigns go on Adapty's autopilot, what blocks them, what the user must supply | `playbooks/autopilot-readiness.md` |
+| Which keywords to put on Adapty's autopilot, whether keywords or campaigns can go there, what blocks them, what the user must supply | `playbooks/autopilot-readiness.md` |
 | Put specific keywords on the keyword autopilot | `playbooks/keyword-autopilot-launch.md` |
 | Turn on the budget autopilot, or move it from dry run to Live | `playbooks/budget-autopilot-launch.md` |
 | What did the autopilots do, do they work, what needs attention | `playbooks/autopilot-review.md` |
