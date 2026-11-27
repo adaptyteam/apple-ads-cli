@@ -4,7 +4,7 @@ license: MIT
 description: Use when the Adapty CLI needs installing or authenticating before any Apple Search Ads work — a fresh Cowork or cloud session, "adapty: command not found", AuthRequiredError, an expired auth code, or connecting an Apple Search Ads account. Triggers on "install the Adapty CLI", "set up adapty", "adapty auth login", "connect Apple Search Ads", "not authenticated", or any Apple Ads request made in a session where the CLI is not yet installed.
 ---
 
-<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.25.1 (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
+<!-- GENERATED — synced from adaptyteam/adapty-cli@v0.33.0 (docs/agent/skills/adapty-cli-setup/SKILL.md). Do not edit here.
      Edits are overwritten by .github/workflows/sync-from-cli.yml on the next CLI release. -->
 
 # Adapty CLI setup
@@ -143,6 +143,8 @@ the dashboard usually means the token is scoped elsewhere.
   auth failure that makes no sense.
 - It dies with the shell. A token that works in one command and not the next was never exported, or
   was exported in a different process.
+
+EU account: `adapty auth login --region eu` or `ADAPTY_REGION=eu`; after a damaged login file, run `adapty auth login --region us` or `--region eu` with the region of the account (with no region, the login stops at the damaged file too); if you do not know it, ask the user. A script with `ADAPTY_TOKEN` also sets `ADAPTY_REGION`: without it the command takes the region of the saved login, which can belong to another account.
 
 `adapty auth login` works in a cloud session — the browser can be anywhere. **Never tell the user
 browser login is unavailable here, and never ask them for a token because the session is remote.**
